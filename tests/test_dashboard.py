@@ -267,6 +267,10 @@ class TestShape(unittest.TestCase):
         self.assertIn("_meta", self.d)
         self.assertEqual(self.d["_meta"]["k_threshold"], K_THRESHOLD)
         self.assertIn("generated_at", self.d["_meta"])
+        self.assertRegex(
+            self.d["_meta"]["generated_at"],
+            r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?\+00:00$",
+        )
         self.assertEqual(len(self.d["_meta"]["sources"]), 3)
 
 

@@ -16,6 +16,7 @@ Privacy rules (see README.md for full description):
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from collections import defaultdict
@@ -34,6 +35,14 @@ RAW_DIR = ROOT / "data" / "raw"
 OUT_DIR = ROOT / "data" / "processed"
 
 K_THRESHOLD = 5  # k-anonymity: any cell with count < 5 is suppressed
+
+
+def build_timestamp() -> str:
+    """Return a UTC build time, honoring reproducible-build conventions."""
+    source_date_epoch = os.environ.get("SOURCE_DATE_EPOCH")
+    if source_date_epoch is not None:
+        return pd.Timestamp(int(source_date_epoch), unit="s", tz="UTC").isoformat()
+    return pd.Timestamp.now("UTC").isoformat()
 
 # Forbidden column-name substrings — these MUST NEVER appear in processed output.
 FORBIDDEN_COL_FRAGMENTS = (
@@ -734,7 +743,7 @@ def main() -> int:
         **demo,
         "_meta": {
             "k_threshold": K_THRESHOLD,
-            "generated_at": pd.Timestamp.now("UTC").isoformat(),
+            "generated_at": build_timestamp(),
             "sources": [
                 {"file": "shs_2019_2022.xlsx", "rows": len(a)},
                 {"file": "shs_2023.xlsx", "rows": len(b)},

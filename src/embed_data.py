@@ -1,6 +1,6 @@
 """Build the self-contained SHS dashboard HTML.
 
-The checked-in ``SHS_Dashboard.html.bak`` file is the canonical visual
+The checked-in ``SHS_Dashboard.template.html`` file is the canonical visual
 template. This builder replaces its placeholder data object with the latest
 privacy-safe JSON and embeds Chart.js, so the output works from ``file://``
 without a server or network connection.
