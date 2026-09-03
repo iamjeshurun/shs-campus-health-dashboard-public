@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Makes the generated artifact byte-for-byte reproducible in CI.
+      SOURCE_DATE_EPOCH: "1751241600"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Build synthetic dashboard and run tests
+        run: |
+          python src/generate_synthetic_data.py
+          python src/build_dashboard.py
+          python src/embed_data.py
+          python -m unittest discover -s tests -v
+
+      - name: Confirm generated dashboard is reproducible
+        run: git diff --exit-code -- SHS_Dashboard.html
