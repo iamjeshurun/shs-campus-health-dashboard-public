@@ -14,7 +14,7 @@ included.
 - Multi-format Excel ingestion and schema normalization with pandas
 - Diagnosis, visit-type, demographic, status, and time-series aggregation
 - Build-time PII exclusion and k-anonymity with `k = 5`
-- Automated privacy, schema, HTML, browser, and responsive-layout tests
+- Automated privacy, schema, HTML, browser, responsive-layout, and keyboard-navigation tests
 - A self-contained HTML deliverable with embedded data and Chart.js
 - A controlled release process that separates internal inputs from public output
 

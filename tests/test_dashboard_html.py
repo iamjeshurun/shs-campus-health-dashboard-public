@@ -31,6 +31,13 @@ class TestGeneratedDashboardHtml(unittest.TestCase):
         self.assertIn("const D = {", self.html)
         self.assertIn("Chart.js 4.4.1", self.html)
 
+    def test_accessible_tab_structure_is_generated(self):
+        self.assertEqual(len(re.findall(r'<button[^>]+role="tab"', self.html)), 6)
+        self.assertEqual(len(re.findall(r'<div[^>]+role="tabpanel"', self.html)), 6)
+        self.assertIn('href="#dashboard-main"', self.html)
+        self.assertIn("event.key==='ArrowRight'", self.html)
+        self.assertIn('aria-pressed="true"', self.html)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

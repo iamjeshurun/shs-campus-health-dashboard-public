@@ -32,6 +32,12 @@
     color: var(--ink);
     min-height: 100vh;
   }
+  .skip-link {
+    position: fixed; left: 1rem; top: 0.5rem; z-index: 1000;
+    background: white; color: var(--dark); padding: 0.65rem 1rem;
+    border-radius: 6px; transform: translateY(-160%);
+  }
+  .skip-link:focus { transform: translateY(0); }
 
   /* ── HEADER ── */
   header {
@@ -203,6 +209,7 @@
 </head>
 <body>
 
+<a class="skip-link" href="#dashboard-main">Skip to dashboard content</a>
 <header>
   <div class="logo">
     <div class="logo-mark">S</div>
@@ -215,20 +222,20 @@
 </header>
 
 <nav aria-label="Dashboard sections" role="tablist">
-  <button class="active" role="tab" aria-selected="true" aria-controls="tab-overview" onclick="showTab('overview',this)">📊 Overview</button>
-  <button role="tab" aria-selected="false" aria-controls="tab-volume" onclick="showTab('volume',this)">📈 Visit Volume</button>
-  <button role="tab" aria-selected="false" aria-controls="tab-infectious" onclick="showTab('infectious',this)">🦠 Infectious Disease</button>
-  <button role="tab" aria-selected="false" aria-controls="tab-operations" onclick="showTab('operations',this)">⏱ Operations</button>
-  <button role="tab" aria-selected="false" aria-controls="tab-diagnoses" onclick="showTab('diagnoses',this)">🩺 Top Diagnoses</button>
-  <button role="tab" aria-selected="false" aria-controls="tab-demographics" onclick="showTab('demographics',this)">👥 Demographics</button>
+  <button id="tab-button-overview" type="button" class="active" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-overview" onclick="showTab('overview',this)">📊 Overview</button>
+  <button id="tab-button-volume" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-volume" onclick="showTab('volume',this)">📈 Visit Volume</button>
+  <button id="tab-button-infectious" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-infectious" onclick="showTab('infectious',this)">🦠 Infectious Disease</button>
+  <button id="tab-button-operations" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-operations" onclick="showTab('operations',this)">⏱ Operations</button>
+  <button id="tab-button-diagnoses" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-diagnoses" onclick="showTab('diagnoses',this)">🩺 Top Diagnoses</button>
+  <button id="tab-button-demographics" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-demographics" onclick="showTab('demographics',this)">👥 Demographics</button>
 </nav>
 
-<main>
+<main id="dashboard-main" tabindex="-1">
 
 <!-- ══════════════════════════════════════════════════════════ -->
 <!-- OVERVIEW -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-overview" class="section active">
+<div id="tab-overview" class="section active" role="tabpanel" aria-labelledby="tab-button-overview">
   <div class="kpi-strip" id="kpi-strip"></div>
   <div class="grid-2">
     <div class="card">
@@ -253,7 +260,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!-- VOLUME -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-volume" class="section">
+<div id="tab-volume" class="section" role="tabpanel" aria-labelledby="tab-button-volume" hidden>
   <div class="section-title">Visit Volume Analysis</div>
   <div class="kpi-strip" id="volume-kpis"></div>
   <div class="card" style="margin-bottom:1.5rem">
@@ -274,8 +281,9 @@
       <h3><span>🎯</span> ADHD Visit Trend (2023–2025)</h3>
       <canvas id="vol-adhd"></canvas>
       <div class="insight" style="font-size:0.78rem">
-        ADHD encounters appear <strong>year-round</strong> with slight spikes at semester start
-        (Jan, Sep). A dedicated ADHD follow-up telemedicine block could reduce in-person pressure.
+        Counts below five are suppressed to protect privacy. If sufficient internal data are
+        available, compare appointment modality and follow-up demand before testing any
+        scheduling change.
       </div>
     </div>
   </div>
@@ -284,7 +292,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!-- INFECTIOUS -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-infectious" class="section">
+<div id="tab-infectious" class="section" role="tabpanel" aria-labelledby="tab-button-infectious" hidden>
   <div class="section-title">Infectious Disease Surveillance</div>
   <div class="kpi-strip" id="infectious-kpis"></div>
   <div class="card" style="margin-bottom:1.5rem">
@@ -319,14 +327,14 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!-- OPERATIONS -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-operations" class="section">
+<div id="tab-operations" class="section" role="tabpanel" aria-labelledby="tab-button-operations" hidden>
   <div class="section-title">Operational Analytics</div>
   <div class="kpi-strip" id="operations-kpis"></div>
   <div class="card" style="margin-bottom:1.5rem">
     <h3><span>🔥</span> Appointment Density Heatmap — Combined 2023 & 2024–25</h3>
     <div class="hm-toggle">
-      <button class="active" onclick="switchHeatmap('total',this)">Total Appointments</button>
-      <button onclick="switchHeatmap('noshow',this)">No-Shows Only</button>
+      <button type="button" class="active" aria-pressed="true" onclick="switchHeatmap('total',this)">Total Appointments</button>
+      <button type="button" aria-pressed="false" onclick="switchHeatmap('noshow',this)">No-Shows Only</button>
     </div>
     <div class="heatmap-wrap">
       <div class="heatmap" id="heatmap-grid"></div>
@@ -352,7 +360,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!-- DIAGNOSES -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-diagnoses" class="section">
+<div id="tab-diagnoses" class="section" role="tabpanel" aria-labelledby="tab-button-diagnoses" hidden>
   <div class="section-title">Top Diagnoses & Health Pillars</div>
   <div class="grid-2">
     <div class="card">
@@ -400,7 +408,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!-- DEMOGRAPHICS -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-demographics" class="section">
+<div id="tab-demographics" class="section" role="tabpanel" aria-labelledby="tab-button-demographics" hidden>
   <div class="section-title">Patient Demographics</div>
   <div class="grid-2">
     <div class="card">
@@ -1527,8 +1535,12 @@ function buildHeatmap(mode) {
 }
 function switchHeatmap(mode, btn) {
   currentHeatmap=mode;
-  document.querySelectorAll('.hm-toggle button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.hm-toggle button').forEach(b=>{
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed','false');
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed','true');
   buildHeatmap(mode);
 }
 
@@ -1608,14 +1620,21 @@ function buildDemographics() {
 // ══════════════════════════════════════════════════════════════
 const built = {};
 function showTab(name, button) {
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>{
+    s.classList.remove('active');
+    s.hidden=true;
+  });
   document.querySelectorAll('nav button').forEach(b=>{
     b.classList.remove('active');
     b.setAttribute('aria-selected','false');
+    b.setAttribute('tabindex','-1');
   });
-  document.getElementById('tab-'+name).classList.add('active');
+  const panel=document.getElementById('tab-'+name);
+  panel.hidden=false;
+  panel.classList.add('active');
   button.classList.add('active');
   button.setAttribute('aria-selected','true');
+  button.setAttribute('tabindex','0');
   if(!built[name]) {
     built[name]=true;
     if(name==='overview')     buildOverview();
@@ -1626,6 +1645,21 @@ function showTab(name, button) {
     if(name==='demographics') buildDemographics();
   }
 }
+
+document.querySelector('[role="tablist"]').addEventListener('keydown', event=>{
+  const tabs=[...document.querySelectorAll('[role="tab"]')];
+  const current=tabs.indexOf(document.activeElement);
+  if(current<0) return;
+  let next=current;
+  if(event.key==='ArrowRight') next=(current+1)%tabs.length;
+  else if(event.key==='ArrowLeft') next=(current-1+tabs.length)%tabs.length;
+  else if(event.key==='Home') next=0;
+  else if(event.key==='End') next=tabs.length-1;
+  else return;
+  event.preventDefault();
+  tabs[next].click();
+  tabs[next].focus();
+});
 
 // ── INIT ──
 buildKPIs();

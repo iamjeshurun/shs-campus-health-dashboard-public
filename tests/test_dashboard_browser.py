@@ -73,6 +73,30 @@ class TestDashboardBrowser(unittest.TestCase):
         finally:
             page.close()
 
+    def test_keyboard_tabs_and_toggle_states(self):
+        page, errors = self.open_dashboard()
+        try:
+            overview = page.get_by_role("tab", name="Overview")
+            overview.focus()
+            overview.press("ArrowRight")
+            volume = page.get_by_role("tab", name="Visit Volume")
+            self.assertEqual(volume.get_attribute("aria-selected"), "true")
+            self.assertEqual(volume.get_attribute("tabindex"), "0")
+            self.assertTrue(page.locator("#tab-volume").is_visible())
+            self.assertTrue(page.locator("#tab-overview").is_hidden())
+
+            page.get_by_role("tab", name="Operations").click()
+            no_shows = page.get_by_role("button", name="No-Shows Only")
+            no_shows.click()
+            self.assertEqual(no_shows.get_attribute("aria-pressed"), "true")
+            self.assertEqual(
+                page.get_by_role("button", name="Total Appointments").get_attribute("aria-pressed"),
+                "false",
+            )
+            self.assertEqual(errors, [])
+        finally:
+            page.close()
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
