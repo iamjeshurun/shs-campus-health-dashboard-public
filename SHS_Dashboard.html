@@ -368,31 +368,29 @@
       <div style="padding:1rem;background:var(--mist);border-radius:10px;border-left:4px solid var(--teal)">
         <div style="font-weight:700;color:var(--teal);margin-bottom:6px">Infectious Disease</div>
         <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
-          Sore Throat (230), Acute Cough (199), Pharyngitis (82), Viral Syndrome (68), Sinusitis (56).
-          Peaks Sep–Oct and Jan–Feb.
+          Published diagnosis counts are classified using infectious-disease keywords.
+          Use the generated ranking and monthly chart to inspect the synthetic demo pattern.
         </div>
       </div>
       <div style="padding:1rem;background:#eef0fb;border-radius:10px;border-left:4px solid var(--navy)">
         <div style="font-weight:700;color:var(--navy);margin-bottom:6px">Mental Health</div>
         <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
-          Mixed Anxiety & Depression (208), Anxiety & Depression (199), Anxiety (92).
-          Year-round presence — the #1 recurring need on campus.
+          Anxiety, depression, mood, and attention-related descriptions are grouped for
+          descriptive analysis. Categories may overlap within a single encounter.
         </div>
       </div>
       <div style="padding:1rem;background:#fef6ea;border-radius:10px;border-left:4px solid var(--amber)">
         <div style="font-weight:700;color:var(--amber);margin-bottom:6px">Preventive / Wellness</div>
         <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
-          Annual Physical (140), STI Screening (129), Flu Vaccine Need (115), Well Woman Exam (60).
-          These counts describe recorded encounters; cross-period growth was not tested here.
+          Physicals, screenings, vaccinations, and wellness visits are grouped as preventive
+          care. Cross-period growth is not inferred from this view.
         </div>
       </div>
     </div>
     <div class="insight" style="margin-top:1rem">
-      <strong>Key finding:</strong> When all Anxiety / Depression variants are combined
-      (Mixed Anxiety & Depression + Anxiety & Depression + Anxiety), <strong>mental health accounts for
-      ~499 encounter mentions in 2023–2025 alone</strong> — more than any other single condition cluster.
-      This grouping is descriptive and may include overlapping encounter diagnoses; it does not
-      by itself establish prevalence or determine service priorities.
+      <strong>Interpretation:</strong> Diagnosis groupings are descriptive and may include
+      overlapping encounter diagnoses. They do not by themselves establish prevalence,
+      clinical severity, causality, or service priorities.
     </div>
   </div>
 </div>
@@ -434,456 +432,385 @@
 // ══════════════════════════════════════════════════════════════
 const D = {
   "summary": {
-    "total_records": 11037,
+    "total_records": 1320,
     "years_covered": "2019 – 2025",
-    "completion_rate_2425": 69.9,
-    "noshow_rate_2425": 12.8,
-    "noshow_rate_2023": 9.5,
-    "new_patient_growth": 137.6,
-    "peak_month": "Oct 2022",
+    "completion_rate_2425": 59.5,
+    "noshow_rate_2425": 20.3,
+    "noshow_rate_2023": 20.0,
+    "new_patient_growth": -10.0,
+    "peak_month": "Jan 2023",
     "top_condition": "Sore throat"
   },
   "monthly": [
     {
       "ym": "2019-09",
-      "visits": 0
+      "visits": 12
     },
     {
       "ym": "2019-10",
-      "visits": 0
+      "visits": 13
+    },
+    {
+      "ym": "2019-11",
+      "visits": 11
+    },
+    {
+      "ym": "2019-12",
+      "visits": 13
     },
     {
       "ym": "2020-01",
-      "visits": 0
+      "visits": 12
+    },
+    {
+      "ym": "2020-02",
+      "visits": 11
+    },
+    {
+      "ym": "2020-03",
+      "visits": 12
+    },
+    {
+      "ym": "2020-04",
+      "visits": 12
+    },
+    {
+      "ym": "2020-05",
+      "visits": 12
+    },
+    {
+      "ym": "2020-06",
+      "visits": 12
     },
     {
       "ym": "2020-07",
-      "visits": 0
+      "visits": 12
+    },
+    {
+      "ym": "2020-08",
+      "visits": 13
     },
     {
       "ym": "2020-09",
-      "visits": 5
+      "visits": 11
     },
     {
       "ym": "2020-10",
-      "visits": 0
+      "visits": 13
     },
     {
       "ym": "2020-11",
-      "visits": 10
+      "visits": 11
+    },
+    {
+      "ym": "2020-12",
+      "visits": 13
+    },
+    {
+      "ym": "2021-01",
+      "visits": 12
     },
     {
       "ym": "2021-02",
-      "visits": 0
+      "visits": 11
+    },
+    {
+      "ym": "2021-03",
+      "visits": 12
     },
     {
       "ym": "2021-04",
-      "visits": 7
+      "visits": 12
     },
     {
       "ym": "2021-05",
-      "visits": 0
+      "visits": 12
     },
     {
       "ym": "2021-06",
-      "visits": 0
+      "visits": 12
     },
     {
       "ym": "2021-07",
-      "visits": 0
+      "visits": 12
     },
     {
       "ym": "2021-08",
-      "visits": 53
+      "visits": 12
     },
     {
       "ym": "2021-09",
-      "visits": 107
+      "visits": 12
     },
     {
       "ym": "2021-10",
-      "visits": 159
+      "visits": 12
     },
     {
       "ym": "2021-11",
-      "visits": 130
+      "visits": 12
     },
     {
       "ym": "2021-12",
-      "visits": 85
+      "visits": 12
     },
     {
       "ym": "2022-01",
-      "visits": 665
+      "visits": 12
     },
     {
       "ym": "2022-02",
-      "visits": 717
+      "visits": 11
     },
     {
       "ym": "2022-03",
-      "visits": 882
+      "visits": 13
     },
     {
       "ym": "2022-04",
-      "visits": 625
+      "visits": 11
     },
     {
       "ym": "2022-05",
-      "visits": 228
+      "visits": 13
     },
     {
       "ym": "2022-06",
-      "visits": 138
+      "visits": 11
     },
     {
       "ym": "2022-07",
-      "visits": 105
+      "visits": 13
     },
     {
       "ym": "2022-08",
-      "visits": 599
+      "visits": 12
     },
     {
       "ym": "2022-09",
-      "visits": 760
+      "visits": 12
     },
     {
       "ym": "2022-10",
-      "visits": 999
+      "visits": 12
     },
     {
       "ym": "2022-11",
-      "visits": 961
+      "visits": 12
     },
     {
       "ym": "2022-12",
-      "visits": 327
+      "visits": 12
     },
     {
       "ym": "2023-01",
-      "visits": 181
+      "visits": 31
     },
     {
       "ym": "2023-02",
-      "visits": 184
+      "visits": 28
     },
     {
       "ym": "2023-03",
-      "visits": 174
+      "visits": 30
     },
     {
       "ym": "2023-04",
-      "visits": 196
+      "visits": 30
     },
     {
       "ym": "2023-05",
-      "visits": 64
+      "visits": 30
     },
     {
       "ym": "2023-06",
-      "visits": 49
+      "visits": 30
     },
     {
       "ym": "2023-07",
-      "visits": 44
+      "visits": 31
     },
     {
       "ym": "2023-08",
-      "visits": 104
+      "visits": 30
     },
     {
       "ym": "2023-09",
-      "visits": 289
+      "visits": 30
     },
     {
       "ym": "2023-10",
-      "visits": 240
+      "visits": 30
     },
     {
       "ym": "2023-11",
-      "visits": 212
+      "visits": 30
     },
     {
       "ym": "2023-12",
-      "visits": 92
+      "visits": 30
+    },
+    {
+      "ym": "2024-01",
+      "visits": 28
+    },
+    {
+      "ym": "2024-02",
+      "visits": 25
+    },
+    {
+      "ym": "2024-03",
+      "visits": 27
+    },
+    {
+      "ym": "2024-04",
+      "visits": 27
+    },
+    {
+      "ym": "2024-05",
+      "visits": 27
+    },
+    {
+      "ym": "2024-06",
+      "visits": 26
     },
     {
       "ym": "2024-07",
-      "visits": 39
+      "visits": 27
     },
     {
       "ym": "2024-08",
-      "visits": 90
+      "visits": 28
     },
     {
       "ym": "2024-09",
-      "visits": 219
+      "visits": 26
     },
     {
       "ym": "2024-10",
-      "visits": 207
+      "visits": 27
     },
     {
       "ym": "2024-11",
-      "visits": 204
+      "visits": 26
     },
     {
       "ym": "2024-12",
-      "visits": 102
+      "visits": 28
     },
     {
       "ym": "2025-01",
-      "visits": 134
+      "visits": 27
     },
     {
       "ym": "2025-02",
-      "visits": 171
+      "visits": 24
     },
     {
       "ym": "2025-03",
-      "visits": 144
+      "visits": 28
     },
     {
       "ym": "2025-04",
-      "visits": 194
+      "visits": 26
     },
     {
       "ym": "2025-05",
-      "visits": 91
+      "visits": 27
     },
     {
       "ym": "2025-06",
-      "visits": 34
+      "visits": 26
     }
   ],
   "pillars": [
     {
-      "category": "Other",
-      "count": 2610
-    },
-    {
       "category": "Infectious Disease",
-      "count": 2264
+      "count": 240
     },
     {
       "category": "Mental Health",
-      "count": 1128
+      "count": 120
     },
     {
       "category": "Preventive / Wellness",
-      "count": 640
+      "count": 60
     },
     {
       "category": "Chronic Disease",
-      "count": 590
-    },
-    {
-      "category": "Musculoskeletal",
-      "count": 347
+      "count": 60
     }
   ],
   "status": [
     {
       "year": "2023",
-      "Completed": 1289,
-      "Canceled": 366,
-      "No Show": 174,
-      "total": 1829
+      "Completed": 216,
+      "Canceled": 72,
+      "No Show": 72,
+      "total": 360
     },
     {
       "year": "2024",
-      "Completed": 595,
-      "Canceled": 141,
-      "No Show": 125,
-      "total": 861
+      "Completed": 194,
+      "Canceled": 64,
+      "No Show": 64,
+      "total": 322
     },
     {
       "year": "2025",
-      "Completed": 535,
-      "Canceled": 132,
-      "No Show": 98,
-      "total": 765
+      "Completed": 94,
+      "Canceled": 32,
+      "No Show": 32,
+      "total": 158
     }
   ],
   "top_diagnoses": [
     {
       "diagnosis": "Sore throat",
-      "count": 168
-    },
-    {
-      "diagnosis": "Mixed anxiety and depressive disorder",
-      "count": 163
-    },
-    {
-      "diagnosis": "Anxiety and depression",
-      "count": 160
+      "count": 105
     },
     {
       "diagnosis": "Acute cough",
-      "count": 157
+      "count": 105
     },
     {
-      "diagnosis": "Other fatigue",
-      "count": 125
-    },
-    {
-      "diagnosis": "Flu vaccine need",
-      "count": 113
-    },
-    {
-      "diagnosis": "Routine screening for STI (sexually transmitted infection)",
-      "count": 98
-    },
-    {
-      "diagnosis": "Annual physical exam",
-      "count": 91
-    },
-    {
-      "diagnosis": "Dysuria",
-      "count": 80
-    },
-    {
-      "diagnosis": "Acute pharyngitis, unspecified etiology",
-      "count": 80
+      "diagnosis": "Mixed anxiety and depressive disorder",
+      "count": 105
     },
     {
       "diagnosis": "Anxiety",
-      "count": 68
+      "count": 105
     },
     {
-      "diagnosis": "Viral syndrome",
-      "count": 68
+      "diagnosis": "Annual physical exam",
+      "count": 105
     },
     {
-      "diagnosis": "Fever, unspecified fever cause",
-      "count": 54
+      "diagnosis": "Flu vaccine need",
+      "count": 105
     },
     {
-      "diagnosis": "Physical exam",
-      "count": 54
+      "diagnosis": "Acute pharyngitis, unspecified etiology",
+      "count": 105
     },
     {
-      "diagnosis": "Encounter for initial prescription of contraceptive pills",
-      "count": 48
-    },
-    {
-      "diagnosis": "Mild intermittent asthma, unspecified whether complicated",
-      "count": 47
-    },
-    {
-      "diagnosis": "Encounter for well woman exam with routine gynecological exam",
-      "count": 43
-    },
-    {
-      "diagnosis": "Hyperlipidemia, unspecified hyperlipidemia type",
-      "count": 42
-    },
-    {
-      "diagnosis": "Acute non-recurrent frontal sinusitis",
-      "count": 41
-    },
-    {
-      "diagnosis": "Nausea and vomiting, unspecified vomiting type",
-      "count": 41
-    },
-    {
-      "diagnosis": "Other",
-      "count": 2168
+      "diagnosis": "Mild intermittent asthma",
+      "count": 105
     }
   ],
   "visit_types_2023": {
-    "OFFICE VISIT": 1408,
-    "SUPPORT STAFF VISIT": 155,
-    "PHYSICAL": 99,
-    "NEW PATIENT": 93,
-    "TELEMEDICINE": 56,
-    "HOSPITAL FOLLOW UP": 10,
-    "WELL WOMAN": 8
+    "OFFICE VISIT": 90,
+    "NEW PATIENT": 90,
+    "PHYSICAL": 90,
+    "SUPPORT STAFF VISIT": 90
   },
   "visit_types_2425": {
-    "OFFICE VISIT": 941,
-    "NEW PATIENT": 321,
-    "SUPPORT STAFF VISIT": 214,
-    "PHYSICAL": 79,
-    "TELEMEDICINE": 35,
-    "WELL WOMAN": 28,
-    "HOSPITAL FOLLOW UP": 10
+    "OFFICE VISIT": 120,
+    "NEW PATIENT": 120,
+    "PHYSICAL": 120,
+    "SUPPORT STAFF VISIT": 120
   },
-  "adhd": [
-    {
-      "ym": "2023-01",
-      "adhd": 14
-    },
-    {
-      "ym": "2023-02",
-      "adhd": 6
-    },
-    {
-      "ym": "2023-03",
-      "adhd": 8
-    },
-    {
-      "ym": "2023-08",
-      "adhd": 0
-    },
-    {
-      "ym": "2023-09",
-      "adhd": 7
-    },
-    {
-      "ym": "2023-10",
-      "adhd": 8
-    },
-    {
-      "ym": "2023-11",
-      "adhd": 8
-    },
-    {
-      "ym": "2023-12",
-      "adhd": 6
-    },
-    {
-      "ym": "2024-08",
-      "adhd": 0
-    },
-    {
-      "ym": "2024-09",
-      "adhd": 8
-    },
-    {
-      "ym": "2024-10",
-      "adhd": 0
-    },
-    {
-      "ym": "2024-11",
-      "adhd": 0
-    },
-    {
-      "ym": "2024-12",
-      "adhd": 0
-    },
-    {
-      "ym": "2025-01",
-      "adhd": 0
-    },
-    {
-      "ym": "2025-02",
-      "adhd": 8
-    },
-    {
-      "ym": "2025-03",
-      "adhd": 6
-    },
-    {
-      "ym": "2025-04",
-      "adhd": 8
-    },
-    {
-      "ym": "2025-05",
-      "adhd": 0
-    }
-  ],
+  "adhd": [],
   "infectious": [
     {
       "ym": "2023-01",
@@ -895,19 +822,19 @@ const D = {
       "ym": "2023-02",
       "covid": 0,
       "flu": 0,
-      "strep": 11
+      "strep": 0
     },
     {
       "ym": "2023-03",
       "covid": 0,
       "flu": 0,
-      "strep": 9
+      "strep": 0
     },
     {
       "ym": "2023-04",
       "covid": 0,
       "flu": 0,
-      "strep": 18
+      "strep": 0
     },
     {
       "ym": "2023-05",
@@ -922,31 +849,79 @@ const D = {
       "strep": 0
     },
     {
+      "ym": "2023-07",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
       "ym": "2023-08",
-      "covid": 6,
-      "flu": 5,
-      "strep": 5
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
     },
     {
       "ym": "2023-09",
-      "covid": 9,
-      "flu": 20,
-      "strep": 17
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
     },
     {
       "ym": "2023-10",
       "covid": 0,
-      "flu": 17,
-      "strep": 15
+      "flu": 0,
+      "strep": 0
     },
     {
       "ym": "2023-11",
       "covid": 0,
-      "flu": 20,
-      "strep": 6
+      "flu": 0,
+      "strep": 0
     },
     {
       "ym": "2023-12",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2024-01",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2024-02",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2024-03",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2024-04",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2024-05",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2024-06",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2024-07",
       "covid": 0,
       "flu": 0,
       "strep": 0
@@ -960,426 +935,357 @@ const D = {
     {
       "ym": "2024-09",
       "covid": 0,
-      "flu": 19,
+      "flu": 0,
       "strep": 0
     },
     {
       "ym": "2024-10",
       "covid": 0,
-      "flu": 20,
+      "flu": 0,
       "strep": 0
     },
     {
       "ym": "2024-11",
       "covid": 0,
-      "flu": 18,
-      "strep": 5
+      "flu": 0,
+      "strep": 0
     },
     {
       "ym": "2024-12",
       "covid": 0,
-      "flu": 7,
+      "flu": 0,
       "strep": 0
     },
     {
       "ym": "2025-01",
       "covid": 0,
-      "flu": 25,
+      "flu": 0,
       "strep": 0
     },
     {
       "ym": "2025-02",
       "covid": 0,
-      "flu": 14,
+      "flu": 0,
       "strep": 0
     },
     {
       "ym": "2025-03",
       "covid": 0,
-      "flu": 6,
+      "flu": 0,
       "strep": 0
     },
     {
       "ym": "2025-04",
       "covid": 0,
       "flu": 0,
-      "strep": 5
+      "strep": 0
+    },
+    {
+      "ym": "2025-05",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
+    },
+    {
+      "ym": "2025-06",
+      "covid": 0,
+      "flu": 0,
+      "strep": 0
     }
   ],
   "heatmap_total": [
     {
       "day": "Monday",
       "hour": 8,
-      "value": 82
+      "value": 12
     },
     {
       "day": "Monday",
       "hour": 9,
-      "value": 101
+      "value": 14
     },
     {
       "day": "Monday",
       "hour": 10,
-      "value": 116
+      "value": 15
     },
     {
       "day": "Monday",
       "hour": 11,
-      "value": 75
+      "value": 12
+    },
+    {
+      "day": "Monday",
+      "hour": 12,
+      "value": 13
     },
     {
       "day": "Monday",
       "hour": 13,
-      "value": 106
+      "value": 15
     },
     {
       "day": "Monday",
       "hour": 14,
-      "value": 138
+      "value": 12
     },
     {
       "day": "Monday",
       "hour": 15,
-      "value": 94
+      "value": 14
+    },
+    {
+      "day": "Monday",
+      "hour": 16,
+      "value": 14
     },
     {
       "day": "Tuesday",
       "hour": 8,
-      "value": 79
+      "value": 14
     },
     {
       "day": "Tuesday",
       "hour": 9,
-      "value": 146
+      "value": 13
     },
     {
       "day": "Tuesday",
       "hour": 10,
-      "value": 135
+      "value": 14
     },
     {
       "day": "Tuesday",
       "hour": 11,
-      "value": 88
+      "value": 14
+    },
+    {
+      "day": "Tuesday",
+      "hour": 12,
+      "value": 12
     },
     {
       "day": "Tuesday",
       "hour": 13,
-      "value": 120
+      "value": 13
     },
     {
       "day": "Tuesday",
       "hour": 14,
-      "value": 163
+      "value": 14
     },
     {
       "day": "Tuesday",
       "hour": 15,
-      "value": 98
+      "value": 12
+    },
+    {
+      "day": "Tuesday",
+      "hour": 16,
+      "value": 13
     },
     {
       "day": "Wednesday",
       "hour": 8,
-      "value": 86
+      "value": 14
     },
     {
       "day": "Wednesday",
       "hour": 9,
-      "value": 108
+      "value": 13
     },
     {
       "day": "Wednesday",
       "hour": 10,
-      "value": 100
+      "value": 12
     },
     {
       "day": "Wednesday",
       "hour": 11,
-      "value": 65
+      "value": 14
+    },
+    {
+      "day": "Wednesday",
+      "hour": 12,
+      "value": 14
     },
     {
       "day": "Wednesday",
       "hour": 13,
-      "value": 100
+      "value": 12
     },
     {
       "day": "Wednesday",
       "hour": 14,
-      "value": 119
+      "value": 14
     },
     {
       "day": "Wednesday",
       "hour": 15,
-      "value": 83
+      "value": 14
+    },
+    {
+      "day": "Wednesday",
+      "hour": 16,
+      "value": 14
     },
     {
       "day": "Thursday",
       "hour": 8,
-      "value": 78
+      "value": 13
     },
     {
       "day": "Thursday",
       "hour": 9,
-      "value": 136
+      "value": 14
     },
     {
       "day": "Thursday",
       "hour": 10,
-      "value": 119
+      "value": 14
     },
     {
       "day": "Thursday",
       "hour": 11,
-      "value": 80
+      "value": 12
+    },
+    {
+      "day": "Thursday",
+      "hour": 12,
+      "value": 14
     },
     {
       "day": "Thursday",
       "hour": 13,
-      "value": 108
+      "value": 13
     },
     {
       "day": "Thursday",
       "hour": 14,
-      "value": 137
+      "value": 13
     },
     {
       "day": "Thursday",
       "hour": 15,
-      "value": 85
+      "value": 13
+    },
+    {
+      "day": "Thursday",
+      "hour": 16,
+      "value": 13
     },
     {
       "day": "Friday",
       "hour": 8,
-      "value": 83
+      "value": 13
     },
     {
       "day": "Friday",
       "hour": 9,
-      "value": 150
+      "value": 12
     },
     {
       "day": "Friday",
       "hour": 10,
-      "value": 158
+      "value": 14
     },
     {
       "day": "Friday",
       "hour": 11,
-      "value": 121
+      "value": 14
+    },
+    {
+      "day": "Friday",
+      "hour": 12,
+      "value": 13
+    },
+    {
+      "day": "Friday",
+      "hour": 13,
+      "value": 15
+    },
+    {
+      "day": "Friday",
+      "hour": 14,
+      "value": 12
+    },
+    {
+      "day": "Friday",
+      "hour": 15,
+      "value": 14
+    },
+    {
+      "day": "Friday",
+      "hour": 16,
+      "value": 13
     }
   ],
   "heatmap_noshow": [
     {
       "day": "Monday",
-      "hour": 8,
-      "value": 8
-    },
-    {
-      "day": "Monday",
       "hour": 9,
-      "value": 18
+      "value": 5
     },
     {
       "day": "Monday",
       "hour": 10,
-      "value": 16
-    },
-    {
-      "day": "Monday",
-      "hour": 11,
-      "value": 11
-    },
-    {
-      "day": "Monday",
-      "hour": 13,
-      "value": 16
-    },
-    {
-      "day": "Monday",
-      "hour": 14,
-      "value": 21
-    },
-    {
-      "day": "Monday",
-      "hour": 15,
-      "value": 12
-    },
-    {
-      "day": "Tuesday",
-      "hour": 8,
       "value": 7
     },
     {
-      "day": "Tuesday",
-      "hour": 9,
-      "value": 16
-    },
-    {
-      "day": "Tuesday",
-      "hour": 10,
-      "value": 19
-    },
-    {
-      "day": "Tuesday",
-      "hour": 11,
-      "value": 8
-    },
-    {
-      "day": "Tuesday",
-      "hour": 13,
-      "value": 16
-    },
-    {
-      "day": "Tuesday",
-      "hour": 14,
-      "value": 13
-    },
-    {
-      "day": "Tuesday",
-      "hour": 15,
-      "value": 12
-    },
-    {
-      "day": "Wednesday",
-      "hour": 8,
-      "value": 7
-    },
-    {
-      "day": "Wednesday",
-      "hour": 9,
-      "value": 15
-    },
-    {
-      "day": "Wednesday",
-      "hour": 10,
-      "value": 6
-    },
-    {
-      "day": "Wednesday",
+      "day": "Monday",
       "hour": 11,
       "value": 5
     },
     {
-      "day": "Wednesday",
-      "hour": 13,
-      "value": 14
-    },
-    {
-      "day": "Wednesday",
-      "hour": 14,
-      "value": 18
-    },
-    {
-      "day": "Wednesday",
-      "hour": 15,
-      "value": 8
-    },
-    {
-      "day": "Thursday",
-      "hour": 8,
-      "value": 6
-    },
-    {
-      "day": "Thursday",
-      "hour": 9,
-      "value": 14
-    },
-    {
-      "day": "Thursday",
-      "hour": 10,
-      "value": 18
-    },
-    {
-      "day": "Thursday",
-      "hour": 11,
-      "value": 5
-    },
-    {
-      "day": "Thursday",
-      "hour": 13,
-      "value": 11
-    },
-    {
-      "day": "Thursday",
-      "hour": 14,
-      "value": 13
-    },
-    {
-      "day": "Thursday",
-      "hour": 15,
-      "value": 9
-    },
-    {
-      "day": "Friday",
-      "hour": 8,
-      "value": 8
-    },
-    {
-      "day": "Friday",
-      "hour": 9,
-      "value": 16
-    },
-    {
       "day": "Friday",
       "hour": 10,
-      "value": 15
+      "value": 7
     },
     {
       "day": "Friday",
       "hour": 11,
-      "value": 16
+      "value": 5
     }
   ],
   "gender_2023": {
-    "Male": 266,
-    "Female": 815,
-    "Other": 19,
-    "Transgender Male": 19
+    "Female": 90,
+    "Male": 90,
+    "Non-Binary": 90,
+    "Transgender Male": 90
   },
   "gender_2425": {
-    "Female": 1123,
-    "Male": 467,
-    "Transgender Male": 11,
-    "Other": 18,
-    "Transgender Female": 10
+    "Female": 120,
+    "Male": 120,
+    "Non-Binary": 120,
+    "Transgender Male": 120
   },
   "race_2023": {
-    "White": 1227,
-    "Multiple / Other": 63,
-    "Black or African American": 308,
-    "Other": 113,
-    "Chinese American": 5,
-    "Unknown": 75,
-    "Other Asian": 12,
-    "Asian Indian": 8,
-    "Chinese": 6,
-    "Korean": 7
+    "White": 90,
+    "Black or African American": 90,
+    "Other Asian": 90,
+    "Multiple / Other": 90
   },
   "race_2425": {
-    "White": 1059,
-    "Unknown": 35,
-    "Black or African American": 304,
-    "Multiple / Other": 66,
-    "Other": 109,
-    "Chinese": 12,
-    "Korean": 14,
-    "Other Asian": 23
+    "White": 120,
+    "Black or African American": 120,
+    "Other Asian": 120,
+    "Multiple / Other": 120
   },
   "_meta": {
     "k_threshold": 5,
-    "generated_at": "2026-08-26T02:06:15.981703+00:00",
+    "generated_at": "2026-08-26T05:16:50.171661+00:00",
     "sources": [
       {
         "file": "shs_2019_2022.xlsx",
-        "rows": 7579
+        "rows": 480
       },
       {
         "file": "shs_2023.xlsx",
-        "rows": 1829
+        "rows": 360
       },
       {
         "file": "shs_2024_2025.xlsx",
-        "rows": 1629
+        "rows": 480
       }
     ]
   }

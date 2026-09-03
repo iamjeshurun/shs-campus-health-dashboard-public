@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stetson Health Services · Campus Health Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --teal:    #028090;
+    --teal-lt: #02c39a;
+    --navy:    #065a82;
+    --dark:    #0d1b2a;
+    --warn:    #e5383b;
+    --amber:   #fb8500;
+    --ink:     #1c2b3a;
+    --mist:    #eaf6f6;
+    --mid:     #8fa8b2;
+    --white:   #ffffff;
+    --card:    #f7fbfc;
+    --border:  #d0e8ec;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f7f9;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--dark);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 3px solid var(--teal);
+  }
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-mark {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-lt));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: white;
+  }
+  .logo-text { font-family: 'DM Serif Display', serif; color: white; font-size: 1.1rem; }
+  .logo-sub  { font-size: 0.7rem; color: var(--mid); letter-spacing: 0.08em; text-transform: uppercase; }
+  .header-badge {
+    background: rgba(2,128,144,0.25); border: 1px solid var(--teal);
+    color: var(--teal-lt); padding: 4px 12px; border-radius: 20px;
+    font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    background: white;
+    border-bottom: 2px solid var(--border);
+    padding: 0 2rem;
+    display: flex; gap: 0; overflow-x: auto;
+  }
+  nav button {
+    background: none; border: none; cursor: pointer;
+    padding: 14px 20px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+    font-weight: 500; color: var(--mid); white-space: nowrap;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  nav button:hover { color: var(--teal); }
+  nav button.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 600; }
+  nav button:focus-visible, .hm-toggle button:focus-visible {
+    outline: 3px solid var(--amber); outline-offset: 2px;
+  }
+
+  /* ── LAYOUT ── */
+  main { max-width: 1300px; margin: 0 auto; padding: 2rem; }
+  .section { display: none; animation: fadein 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadein { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1rem; margin-bottom: 2rem;
+  }
+  .kpi {
+    background: white; border-radius: 12px; padding: 1.2rem 1.4rem;
+    border-left: 4px solid var(--teal);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: transform 0.15s;
+  }
+  .kpi:hover { transform: translateY(-2px); }
+  .kpi.warn { border-left-color: var(--warn); }
+  .kpi.amber { border-left-color: var(--amber); }
+  .kpi.navy { border-left-color: var(--navy); }
+  .kpi.green { border-left-color: var(--teal-lt); }
+  .kpi-val { font-family: 'DM Serif Display', serif; font-size: 2.1rem; color: var(--dark); line-height: 1; }
+  .kpi-label { font-size: 0.75rem; color: var(--mid); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .kpi-note { font-size: 0.72rem; color: var(--teal); margin-top: 4px; }
+
+  /* ── CARDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  @media(max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .card {
+    background: white; border-radius: 14px; padding: 1.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .card-full { grid-column: 1 / -1; }
+  .card h3 {
+    font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--navy);
+    margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+  }
+  .card h3 span { font-size: 1.1rem; }
+  .section-title {
+    font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--dark);
+    margin-bottom: 1.5rem; padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  /* ── HEATMAP ── */
+  .heatmap-wrap { overflow-x: auto; }
+  .heatmap {
+    display: grid;
+    grid-template-columns: 90px repeat(9, 1fr);
+    gap: 4px; min-width: 520px;
+  }
+  .hm-cell {
+    height: 38px; border-radius: 6px; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 600; cursor: default;
+    transition: transform 0.1s;
+  }
+  .hm-cell:hover { transform: scale(1.08); z-index: 1; }
+  .hm-label { background: none; color: var(--mid); font-size: 0.72rem; font-weight: 600; justify-content: flex-end; padding-right: 8px; }
+  .hm-header { background: none; color: var(--mid); font-size: 0.7rem; font-weight: 700; }
+  .hm-toggle { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .hm-toggle button {
+    padding: 5px 14px; border-radius: 20px; border: 2px solid var(--border);
+    background: white; cursor: pointer; font-family: 'DM Sans',sans-serif;
+    font-size: 0.78rem; font-weight: 600; color: var(--mid);
+    transition: all 0.15s;
+  }
+  .hm-toggle button.active { background: var(--teal); border-color: var(--teal); color: white; }
+
+  /* ── TOP DIAGNOSES ── */
+  .diag-bar { margin-bottom: 10px; }
+  .diag-label { font-size: 0.8rem; color: var(--ink); margin-bottom: 3px; display: flex; justify-content: space-between; }
+  .diag-track { background: var(--mist); border-radius: 4px; height: 10px; overflow: hidden; }
+  .diag-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--teal), var(--teal-lt)); transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+  .diag-fill.mental { background: linear-gradient(90deg, var(--navy), #1c7293); }
+  .diag-fill.infectious { background: linear-gradient(90deg, var(--warn), #f4845f); }
+  .diag-fill.wellness { background: linear-gradient(90deg, var(--teal-lt), #00b4d8); }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--mid); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ── INSIGHT BOX ── */
+  .insight {
+    background: linear-gradient(135deg, #eaf6f6, #d0f0ea);
+    border-left: 4px solid var(--teal-lt); border-radius: 10px;
+    padding: 1rem 1.2rem; margin-top: 1rem; font-size: 0.83rem;
+    color: var(--navy); line-height: 1.6;
+  }
+  .insight strong { color: var(--teal); }
+
+  /* ── RACE/GENDER TABLE ── */
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; }
+  .demo-pill {
+    background: var(--mist); border-radius: 10px; padding: 12px 10px; text-align: center;
+    border: 1px solid var(--border);
+  }
+  .demo-pill-val { font-family: 'DM Serif Display',serif; font-size: 1.5rem; color: var(--navy); }
+  .demo-pill-label { font-size: 0.68rem; color: var(--mid); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  canvas { max-height: 280px; }
+  @media(max-width: 600px) {
+    header { height: auto; min-height: 64px; padding: 0.75rem 1rem; gap: 0.75rem; }
+    .header-badge { display: none; }
+    nav { padding: 0 0.5rem; }
+    nav button { padding: 12px 14px; }
+    main { padding: 1rem; }
+    .card { padding: 1rem; }
+    .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kpi { padding: 1rem; }
+    .kpi-val { font-size: 1.6rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">S</div>
+    <div>
+      <div class="logo-text">Stetson Health Services</div>
+      <div class="logo-sub">Campus Health Analytics · 2019 – 2025</div>
+    </div>
+  </div>
+  <div class="header-badge">Internship Dashboard</div>
+</header>
+
+<nav aria-label="Dashboard sections" role="tablist">
+  <button class="active" role="tab" aria-selected="true" aria-controls="tab-overview" onclick="showTab('overview',this)">📊 Overview</button>
+  <button role="tab" aria-selected="false" aria-controls="tab-volume" onclick="showTab('volume',this)">📈 Visit Volume</button>
+  <button role="tab" aria-selected="false" aria-controls="tab-infectious" onclick="showTab('infectious',this)">🦠 Infectious Disease</button>
+  <button role="tab" aria-selected="false" aria-controls="tab-operations" onclick="showTab('operations',this)">⏱ Operations</button>
+  <button role="tab" aria-selected="false" aria-controls="tab-diagnoses" onclick="showTab('diagnoses',this)">🩺 Top Diagnoses</button>
+  <button role="tab" aria-selected="false" aria-controls="tab-demographics" onclick="showTab('demographics',this)">👥 Demographics</button>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- OVERVIEW -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="tab-overview" class="section active">
+  <div class="kpi-strip" id="kpi-strip"></div>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span>📈</span> Monthly Visit Volume (All Years)</h3>
+      <canvas id="ov-volume"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>🏥</span> Health Pillar Distribution (2019–2022)</h3>
+      <canvas id="ov-pillar"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>✅</span> Appointment Status by Year</h3>
+      <canvas id="ov-status"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>🩺</span> Top 10 Diagnoses (2023–2025)</h3>
+      <canvas id="ov-diag"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- VOLUME -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="tab-volume" class="section">
+  <div class="section-title">Visit Volume Analysis</div>
+  <div class="kpi-strip" id="volume-kpis"></div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3><span>📈</span> Full Longitudinal Volume — Sep 2019 to Jun 2025</h3>
+    <canvas id="vol-full" style="max-height:320px"></canvas>
+    <div class="insight">
+      Monthly counts below the privacy threshold are shown as zero. Use the visible
+      seasonal pattern as a planning aid; operational changes should be validated
+      against current staffing, appointment capacity, and unsuppressed internal data.
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span>🗂</span> Visit Types — 2023 vs 2024–25</h3>
+      <canvas id="vol-types"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>🎯</span> ADHD Visit Trend (2023–2025)</h3>
+      <canvas id="vol-adhd"></canvas>
+      <div class="insight" style="font-size:0.78rem">
+        ADHD encounters appear <strong>year-round</strong> with slight spikes at semester start
+        (Jan, Sep). A dedicated ADHD follow-up telemedicine block could reduce in-person pressure.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- INFECTIOUS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="tab-infectious" class="section">
+  <div class="section-title">Infectious Disease Surveillance</div>
+  <div class="kpi-strip" id="infectious-kpis"></div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3><span>🦠</span> COVID-19 · Influenza · Strep / Pharyngitis (Monthly, 2023–2025)</h3>
+    <canvas id="inf-triple" style="max-height:320px"></canvas>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#e5383b"></div>COVID-19</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fb8500"></div>Influenza</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#028090"></div>Strep / Pharyngitis</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span>📉</span> COVID-19 Trend</h3>
+      <canvas id="inf-covid"></canvas>
+      <div class="insight" style="font-size:0.78rem">
+        Counts below five are suppressed to zero. The chart describes recorded
+        encounters and does not establish disease severity, immunity, or vaccination effects.
+      </div>
+    </div>
+    <div class="card">
+      <h3><span>🤧</span> Influenza Seasonality</h3>
+      <canvas id="inf-flu"></canvas>
+      <div class="insight" style="font-size:0.78rem">
+        Recorded influenza encounters vary by month. Use the observed peaks to form
+        planning hypotheses, then validate interventions with current clinical guidance.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- OPERATIONS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="tab-operations" class="section">
+  <div class="section-title">Operational Analytics</div>
+  <div class="kpi-strip" id="operations-kpis"></div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3><span>🔥</span> Appointment Density Heatmap — Combined 2023 & 2024–25</h3>
+    <div class="hm-toggle">
+      <button class="active" onclick="switchHeatmap('total',this)">Total Appointments</button>
+      <button onclick="switchHeatmap('noshow',this)">No-Shows Only</button>
+    </div>
+    <div class="heatmap-wrap">
+      <div class="heatmap" id="heatmap-grid"></div>
+    </div>
+    <div class="insight" style="margin-top:1rem">
+      Darker cells indicate higher recorded volume. Suppressed cells are displayed as blank;
+      use this view to identify periods for further operational review, not as an automatic
+      staffing or overbooking recommendation.
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span>✅</span> Appointment Status Trend</h3>
+      <canvas id="ops-status"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>📋</span> No-Show Rate by Year</h3>
+      <canvas id="ops-noshow"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- DIAGNOSES -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="tab-diagnoses" class="section">
+  <div class="section-title">Top Diagnoses & Health Pillars</div>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span>🏥</span> Health Pillar Breakdown (2019–2022 Baseline)</h3>
+      <canvas id="dx-pillar"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>📊</span> Top 20 Encounter Diagnoses (2023–2025)</h3>
+      <div id="dx-bars" style="overflow-y:auto;max-height:300px;padding-right:4px"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span>💬</span> Diagnosis Category Analysis</h3>
+    <div class="grid-3" style="margin-top:0.5rem">
+      <div style="padding:1rem;background:var(--mist);border-radius:10px;border-left:4px solid var(--teal)">
+        <div style="font-weight:700;color:var(--teal);margin-bottom:6px">Infectious Disease</div>
+        <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
+          Published diagnosis counts are classified using infectious-disease keywords.
+          Use the generated ranking and monthly chart to inspect the synthetic demo pattern.
+        </div>
+      </div>
+      <div style="padding:1rem;background:#eef0fb;border-radius:10px;border-left:4px solid var(--navy)">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:6px">Mental Health</div>
+        <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
+          Anxiety, depression, mood, and attention-related descriptions are grouped for
+          descriptive analysis. Categories may overlap within a single encounter.
+        </div>
+      </div>
+      <div style="padding:1rem;background:#fef6ea;border-radius:10px;border-left:4px solid var(--amber)">
+        <div style="font-weight:700;color:var(--amber);margin-bottom:6px">Preventive / Wellness</div>
+        <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
+          Physicals, screenings, vaccinations, and wellness visits are grouped as preventive
+          care. Cross-period growth is not inferred from this view.
+        </div>
+      </div>
+    </div>
+    <div class="insight" style="margin-top:1rem">
+      <strong>Interpretation:</strong> Diagnosis groupings are descriptive and may include
+      overlapping encounter diagnoses. They do not by themselves establish prevalence,
+      clinical severity, causality, or service priorities.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- DEMOGRAPHICS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="tab-demographics" class="section">
+  <div class="section-title">Patient Demographics</div>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span>⚧</span> Gender Identity — 2023</h3>
+      <canvas id="dem-gender23"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>⚧</span> Gender Identity — 2024–25</h3>
+      <canvas id="dem-gender2425"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>🌍</span> Patient Race — 2023</h3>
+      <canvas id="dem-race23"></canvas>
+    </div>
+    <div class="card">
+      <h3><span>🌍</span> Patient Race — 2024–25</h3>
+      <canvas id="dem-race2425"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <h3><span>📋</span> Demographic Summary</h3>
+    <div class="insight" id="demographic-summary"></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════
+const D = {};
+
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+const TEAL='#028090', TEAL_LT='#02c39a', NAVY='#065a82', WARN='#e5383b', AMBER='#fb8500', MID='#8fa8b2';
+const PILLAR_COLORS = ['#8fa8b2','#028090','#065a82','#02c39a','#e5383b'];
+const GENDER_COLORS = ['#028090','#065a82','#02c39a','#fb8500','#e5383b'];
+const RACE_COLORS   = ['#028090','#065a82','#02c39a','#fb8500','#8fa8b2','#e5383b'];
+
+function mkChart(id, type, labels, datasets, opts={}) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  ctx.setAttribute('role','img');
+  const heading = ctx.closest('.card')?.querySelector('h3')?.textContent?.trim();
+  if (heading) ctx.setAttribute('aria-label', heading);
+  return new Chart(ctx, {
+    type, data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { labels: { font: { family:'DM Sans', size:11 }, boxWidth:12 } }, ...opts.plugins },
+      scales: type==='pie'||type==='doughnut' ? {} : {
+        x: { ticks: { font:{family:'DM Sans',size:10}, maxRotation:45 }, grid:{display:false} },
+        y: { ticks: { font:{family:'DM Sans',size:10} }, grid:{color:'#eaf6f6'} },
+        ...opts.scales
+      },
+      ...opts
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// KPI STRIP
+// ══════════════════════════════════════════════════════════════
+function buildKPIs() {
+  const fmt = value => Number(value).toLocaleString('en-US');
+  const render = (id, items) => {
+    const strip = document.getElementById(id);
+    if (!strip) return;
+    strip.innerHTML = items.map(i=>`
+    <div class="kpi ${i.cls}">
+      <div class="kpi-val">${i.val}</div>
+      <div class="kpi-label">${i.label}</div>
+      <div class="kpi-note">${i.note}</div>
+    </div>`).join('');
+  };
+  const visibleMonths = D.monthly.filter(m=>m.visits >= D._meta.k_threshold);
+  const peakMonth = visibleMonths.reduce((a,b)=>b.visits>a.visits?b:a, visibleMonths[0]);
+  const lowMonth = visibleMonths.reduce((a,b)=>b.visits<a.visits?b:a, visibleMonths[0]);
+  const latestStatus = D.status[D.status.length-1];
+  const maxCell = rows => rows.reduce((a,b)=>b.value>a.value?b:a, rows[0]);
+  const peakTotal = maxCell(D.heatmap_total);
+  const peakNoShow = maxCell(D.heatmap_noshow);
+  const diseasePeak = key => D.infectious.reduce((a,b)=>b[key]>a[key]?b:a, D.infectious[0]);
+
+  render('kpi-strip', [
+    {val:fmt(D.summary.total_records), label:'Total Interactions', note:D.summary.years_covered, cls:''},
+    {val:`${D.summary.completion_rate_2425}%`, label:'Completion Rate', note:`Latest year (${latestStatus.year})`, cls:'green'},
+    {val:`${D.summary.noshow_rate_2425}%`, label:'No-Show Rate', note:`2023: ${D.summary.noshow_rate_2023}%`, cls:'warn'},
+    {val:D.summary.top_condition, label:'Top Recorded Diagnosis', note:'2023–2025', cls:'navy'},
+    {val:D.summary.peak_month, label:'Peak Month', note:`${fmt(peakMonth.visits)} interactions`, cls:'amber'},
+    {val:`${D.summary.new_patient_growth>=0?'+':''}${D.summary.new_patient_growth}%`, label:'New Patient Growth', note:'2023 → 2024', cls:'green'},
+  ]);
+  render('volume-kpis', [
+    {val:fmt(D.summary.total_records), label:'Total Interactions', note:D.summary.years_covered, cls:''},
+    {val:fmt(peakMonth.visits), label:'Highest Published Month', note:peakMonth.ym, cls:'navy'},
+    {val:fmt(lowMonth.visits), label:'Lowest Unsuppressed Month', note:lowMonth.ym, cls:'amber'},
+    {val:`${D.summary.new_patient_growth>=0?'+':''}${D.summary.new_patient_growth}%`, label:'New Patient Growth', note:'2023 → 2024', cls:'green'},
+  ]);
+  render('infectious-kpis', [
+    {val:diseasePeak('covid').ym, label:'Highest COVID Month', note:`${diseasePeak('covid').covid} published encounters`, cls:'warn'},
+    {val:diseasePeak('flu').ym, label:'Highest Flu Month', note:`${diseasePeak('flu').flu} published encounters`, cls:'amber'},
+    {val:diseasePeak('strep').ym, label:'Highest Strep Month', note:`${diseasePeak('strep').strep} published encounters`, cls:''},
+    {val:`k ≥ ${D._meta.k_threshold}`, label:'Privacy Threshold', note:'Smaller cells shown as 0', cls:'navy'},
+  ]);
+  render('operations-kpis', [
+    {val:`${D.summary.noshow_rate_2425}%`, label:'Latest No-Show Rate', note:`2023: ${D.summary.noshow_rate_2023}%`, cls:'warn'},
+    {val:`${peakNoShow.day.slice(0,3)} ${peakNoShow.hour}:00`, label:'Highest No-Show Cell', note:`${peakNoShow.value} published no-shows`, cls:'amber'},
+    {val:`${peakTotal.day.slice(0,3)} ${peakTotal.hour}:00`, label:'Highest Volume Cell', note:`${peakTotal.value} published appointments`, cls:'navy'},
+    {val:`${D.summary.completion_rate_2425}%`, label:'Latest Completion Rate', note:latestStatus.year, cls:'green'},
+  ]);
+
+  const genderTotal = Object.values(D.gender_2023).reduce((a,b)=>a+b,0) + Object.values(D.gender_2425).reduce((a,b)=>a+b,0);
+  const femaleTotal = (D.gender_2023.Female||0) + (D.gender_2425.Female||0);
+  const raceCombined = {};
+  for (const source of [D.race_2023,D.race_2425]) for (const [key,value] of Object.entries(source)) raceCombined[key]=(raceCombined[key]||0)+value;
+  const topRace = Object.entries(raceCombined).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('demographic-summary').innerHTML =
+    `<strong>Descriptive summary:</strong> Female observations comprise ${(femaleTotal/genderTotal*100).toFixed(1)}% of published gender-category counts. `+
+    `${topRace[0]} is the largest published race category (${fmt(topRace[1])} observations across both periods). `+
+    `Categories below k = ${D._meta.k_threshold} are omitted. These are visit-level descriptive counts; they do not measure campus prevalence, access, utilization rates, or disparities without an appropriate enrollment denominator and statistical analysis.`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// OVERVIEW CHARTS
+// ══════════════════════════════════════════════════════════════
+function buildOverview() {
+  // Volume sparkline
+  mkChart('ov-volume','line',
+    D.monthly.map(m=>m.ym.slice(0,7)),
+    [{label:'Visits',data:D.monthly.map(m=>m.visits),
+      borderColor:TEAL,backgroundColor:'rgba(2,128,144,0.12)',
+      fill:true,tension:0.35,pointRadius:0,borderWidth:2}],
+    {plugins:{legend:{display:false}}}
+  );
+  // Pillar doughnut
+  mkChart('ov-pillar','doughnut',
+    D.pillars.map(p=>p.category),
+    [{data:D.pillars.map(p=>p.count),backgroundColor:PILLAR_COLORS,borderWidth:2,borderColor:'#fff'}],
+    {plugins:{legend:{position:'right'}}}
+  );
+  // Status grouped bar
+  mkChart('ov-status','bar',
+    D.status.map(s=>s.year),
+    [
+      {label:'Completed',data:D.status.map(s=>+(s.Completed/s.total*100).toFixed(1)),backgroundColor:TEAL,borderRadius:4},
+      {label:'Canceled', data:D.status.map(s=>+(s.Canceled/s.total*100).toFixed(1)), backgroundColor:AMBER,borderRadius:4},
+      {label:'No Show',  data:D.status.map(s=>+(s['No Show']/s.total*100).toFixed(1)),backgroundColor:WARN,borderRadius:4},
+    ],
+    {scales:{y:{ticks:{callback:v=>v+'%'},max:80}}}
+  );
+  // Top 10 diagnoses horizontal bar
+  const top10 = D.top_diagnoses.slice(0,10);
+  mkChart('ov-diag','bar',
+    top10.map(d=>d.diagnosis.length>30?d.diagnosis.slice(0,30)+'…':d.diagnosis),
+    [{label:'Count',data:top10.map(d=>d.count),
+      backgroundColor:[TEAL,NAVY,TEAL,NAVY,MID,TEAL_LT,TEAL,AMBER,NAVY,TEAL],
+      borderRadius:4}],
+    {indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{display:false}}}}
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// VOLUME CHARTS
+// ══════════════════════════════════════════════════════════════
+function buildVolume() {
+  mkChart('vol-full','line',
+    D.monthly.map(m=>m.ym),
+    [{label:'Monthly Visits',data:D.monthly.map(m=>m.visits),
+      borderColor:TEAL,backgroundColor:'rgba(2,128,144,0.15)',
+      fill:true,tension:0.3,pointRadius:2,pointBackgroundColor:TEAL,borderWidth:2.5}],
+    {plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  );
+  // Visit types
+  const vt_labels = [...new Set([...Object.keys(D.visit_types_2023),...Object.keys(D.visit_types_2425)])];
+  mkChart('vol-types','bar',vt_labels,
+    [
+      {label:'2023',    data:vt_labels.map(k=>D.visit_types_2023[k]||0), backgroundColor:TEAL,   borderRadius:4},
+      {label:'2024–25', data:vt_labels.map(k=>D.visit_types_2425[k]||0), backgroundColor:AMBER,  borderRadius:4},
+    ],
+    {scales:{x:{ticks:{maxRotation:45,font:{size:9}}}}}
+  );
+  // ADHD
+  mkChart('vol-adhd','bar',
+    D.adhd.map(a=>a.ym),
+    [{label:'ADHD Encounters',data:D.adhd.map(a=>a.adhd),
+      backgroundColor:'rgba(6,90,130,0.75)',borderRadius:3}],
+    {plugins:{legend:{display:false}}}
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// INFECTIOUS CHARTS
+// ══════════════════════════════════════════════════════════════
+function buildInfectious() {
+  const inf = D.infectious;
+  const labels = inf.map(i=>i.ym);
+  mkChart('inf-triple','line',labels,
+    [
+      {label:'COVID-19',data:inf.map(i=>i.covid),borderColor:WARN,backgroundColor:'rgba(229,56,59,0.08)',fill:true,tension:0.35,pointRadius:3,borderWidth:2.5},
+      {label:'Influenza',data:inf.map(i=>i.flu),borderColor:AMBER,backgroundColor:'rgba(251,133,0,0.08)',fill:true,tension:0.35,pointRadius:3,borderWidth:2.5},
+      {label:'Strep/Pharyngitis',data:inf.map(i=>i.strep),borderColor:TEAL,backgroundColor:'rgba(2,128,144,0.08)',fill:true,tension:0.35,pointRadius:3,borderWidth:2.5},
+    ],
+    {plugins:{legend:{display:false}}}
+  );
+  mkChart('inf-covid','line',labels,
+    [{label:'COVID-19',data:inf.map(i=>i.covid),borderColor:WARN,backgroundColor:'rgba(229,56,59,0.15)',fill:true,tension:0.35,borderWidth:2.5,pointRadius:3}],
+    {plugins:{legend:{display:false}}}
+  );
+  mkChart('inf-flu','line',labels,
+    [{label:'Influenza',data:inf.map(i=>i.flu),borderColor:AMBER,backgroundColor:'rgba(251,133,0,0.15)',fill:true,tension:0.35,borderWidth:2.5,pointRadius:3}],
+    {plugins:{legend:{display:false}}}
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// HEATMAP
+// ══════════════════════════════════════════════════════════════
+let currentHeatmap = 'total';
+function buildHeatmap(mode) {
+  const data = mode==='total' ? D.heatmap_total : D.heatmap_noshow;
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  const hours=[8,9,10,11,12,13,14,15,16];
+  const vals = data.map(d=>d.value);
+  const maxVal = Math.max(...vals);
+  const grid = document.getElementById('heatmap-grid');
+  grid.innerHTML='';
+  // header row
+  grid.appendChild(Object.assign(document.createElement('div'),{className:'hm-cell hm-label',textContent:''}));
+  hours.forEach(h=>{
+    const el=document.createElement('div');
+    el.className='hm-cell hm-header';
+    el.textContent=h+':00';
+    grid.appendChild(el);
+  });
+  days.forEach(day=>{
+    const label=document.createElement('div');
+    label.className='hm-cell hm-label';
+    label.textContent=day.slice(0,3);
+    grid.appendChild(label);
+    hours.forEach(hour=>{
+      const entry=data.find(d=>d.day===day&&d.hour===hour);
+      const val=entry?entry.value:0;
+      const pct=maxVal>0?val/maxVal:0;
+      const el=document.createElement('div');
+      el.className='hm-cell';
+      el.title=`${day} ${hour}:00 — ${val} ${mode==='noshow'?'no-shows':'appointments'}`;
+      if(mode==='total'){
+        const g=Math.round(255-(255-0)*pct*0.6);
+        const b=Math.round(255-(255-144)*pct*0.8);
+        el.style.background=val>0?`rgb(${Math.round(2+pct*50)},${Math.round(128-pct*60)},${b})`:'#f0f7f9';
+        el.style.color=pct>0.5?'white':pct>0?'#065a82':'#d0e8ec';
+      } else {
+        const r=Math.round(229*pct+200*(1-pct));
+        el.style.background=val>0?`rgba(${r},${Math.round(56*pct)},${Math.round(59*pct)},${0.15+pct*0.85})`:'#f0f7f9';
+        el.style.color=pct>0.5?'white':pct>0?'#c0392b':'#d0e8ec';
+      }
+      if(val>0) el.textContent=val;
+      grid.appendChild(el);
+    });
+  });
+}
+function switchHeatmap(mode, btn) {
+  currentHeatmap=mode;
+  document.querySelectorAll('.hm-toggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildHeatmap(mode);
+}
+
+// ══════════════════════════════════════════════════════════════
+// OPERATIONS CHARTS
+// ══════════════════════════════════════════════════════════════
+function buildOperations() {
+  buildHeatmap('total');
+  mkChart('ops-status','bar',
+    D.status.map(s=>s.year),
+    [
+      {label:'Completed',data:D.status.map(s=>s.Completed),backgroundColor:TEAL,borderRadius:4},
+      {label:'Canceled', data:D.status.map(s=>s.Canceled), backgroundColor:AMBER,borderRadius:4},
+      {label:'No Show',  data:D.status.map(s=>s['No Show']),backgroundColor:WARN,borderRadius:4},
+    ]
+  );
+  mkChart('ops-noshow','bar',
+    D.status.map(s=>s.year),
+    [{label:'No-Show Rate %',
+      data:D.status.map(s=>+(s['No Show']/s.total*100).toFixed(1)),
+      backgroundColor:[TEAL,AMBER,WARN],borderRadius:6}],
+    {plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'%'},max:20}}}
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// DIAGNOSES
+// ══════════════════════════════════════════════════════════════
+function buildDiagnoses() {
+  mkChart('dx-pillar','doughnut',
+    D.pillars.map(p=>p.category),
+    [{data:D.pillars.map(p=>p.count),backgroundColor:PILLAR_COLORS,borderWidth:2,borderColor:'#fff'}],
+    {plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}
+  );
+  const maxCount=D.top_diagnoses[0].count;
+  const mentalKws=['anxiety','depression','mood'];
+  const infectKws=['sore throat','cough','pharyngitis','flu','viral','fever','sinusitis'];
+  const wellKws=['physical','screening','vaccine','well woman','contraceptive'];
+  const barsEl=document.getElementById('dx-bars');
+  barsEl.innerHTML=D.top_diagnoses.map((d,i)=>{
+    const dl=d.diagnosis.toLowerCase();
+    let cls='';
+    if(mentalKws.some(k=>dl.includes(k))) cls='mental';
+    else if(infectKws.some(k=>dl.includes(k))) cls='infectious';
+    else if(wellKws.some(k=>dl.includes(k))) cls='wellness';
+    return `<div class="diag-bar">
+      <div class="diag-label"><span>${i+1}. ${d.diagnosis}</span><span><b>${d.count}</b></span></div>
+      <div class="diag-track"><div class="diag-fill ${cls}" style="width:${(d.count/maxCount*100).toFixed(1)}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// DEMOGRAPHICS
+// ══════════════════════════════════════════════════════════════
+function buildDemographics() {
+  function pieFromObj(id,obj) {
+    const keys=Object.keys(obj), vals=Object.values(obj);
+    mkChart(id,'doughnut',keys,[{data:vals,backgroundColor:GENDER_COLORS,borderWidth:2,borderColor:'#fff'}],
+      {plugins:{legend:{position:'right',labels:{font:{size:11}}}}}
+    );
+  }
+  function raceFromObj(id,obj) {
+    const keys=Object.keys(obj), vals=Object.values(obj);
+    mkChart(id,'doughnut',keys,[{data:vals,backgroundColor:RACE_COLORS,borderWidth:2,borderColor:'#fff'}],
+      {plugins:{legend:{position:'right',labels:{font:{size:10}}}}}
+    );
+  }
+  pieFromObj('dem-gender23',  D.gender_2023);
+  pieFromObj('dem-gender2425',D.gender_2425);
+  raceFromObj('dem-race23',   D.race_2023);
+  raceFromObj('dem-race2425', D.race_2425);
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAB ROUTING
+// ══════════════════════════════════════════════════════════════
+const built = {};
+function showTab(name, button) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>{
+    b.classList.remove('active');
+    b.setAttribute('aria-selected','false');
+  });
+  document.getElementById('tab-'+name).classList.add('active');
+  button.classList.add('active');
+  button.setAttribute('aria-selected','true');
+  if(!built[name]) {
+    built[name]=true;
+    if(name==='overview')     buildOverview();
+    if(name==='volume')       buildVolume();
+    if(name==='infectious')   buildInfectious();
+    if(name==='operations')   buildOperations();
+    if(name==='diagnoses')    buildDiagnoses();
+    if(name==='demographics') buildDemographics();
+  }
+}
+
+// ── INIT ──
+buildKPIs();
+built['overview']=true;
+buildOverview();
+</script>
+</body>
+</html>
