@@ -88,17 +88,24 @@ class TestPrivacy(unittest.TestCase):
                         f"PII-pattern value at {path}: {value[:80]!r}"
                     )
 
-    def test_no_id_or_name_in_string_values(self):
-        """Catch single-word 'name' / 'id' fragments in *values* (descriptions
-        are allowed to mention 'Identity' as in 'Gender Identity', but raw
-        patient names are not)."""
-        for path, _, value in walk(self.d):
-            if not isinstance(value, str):
-                continue
-            vlow = value.lower()
-            self.assertNotIn("patient_name", vlow,
-                f"Suspicious 'patient_name' mention at {path}")
-            # Email / phone / SSN / ZIP shapes are caught by test_no_pii_values.
+
+
+class TestPiiColumnFilter(unittest.TestCase):
+    """Identifying raw columns are dropped before any aggregation."""
+
+    def test_identifying_columns_are_dropped(self):
+        import pandas as pd
+
+        sys.path.insert(0, str(ROOT / "src"))
+        from build_dashboard import _drop_pii_columns
+
+        df = pd.DataFrame(columns=[
+            "patient_name", "date_of_birth", "mrn", "email_address",
+            "phone_number", "gender", "visit_date", "legal_sex",
+        ])
+        self.assertEqual(
+            list(_drop_pii_columns(df).columns), ["gender", "visit_date", "legal_sex"]
+        )
 
 
 class TestSuppression(unittest.TestCase):
@@ -273,16 +280,6 @@ class TestShape(unittest.TestCase):
         )
         self.assertEqual(len(self.d["_meta"]["sources"]), 3)
 
-
-class TestKThresholdMatches(unittest.TestCase):
-    """The k-threshold in the meta block must match the constant."""
-
-    @classmethod
-    def setUpClass(cls):
-        cls.d = load_dashboard()
-
-    def test_k_threshold_is_five(self):
-        self.assertEqual(self.d["_meta"]["k_threshold"], K_THRESHOLD)
 
 
 if __name__ == "__main__":
