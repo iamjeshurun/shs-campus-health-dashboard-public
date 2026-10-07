@@ -22,7 +22,6 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
@@ -52,8 +51,9 @@ FORBIDDEN_COL_FRAGMENTS = (
     "ssn",
     "street_address", "home_address", "address_line",
     "phone_number", "email_address",
-    "legal_sex",  # binary-coded; gender_identity is OK
 )
+# legal_sex is not listed: it is read only as an aggregated fallback for gender
+# in the 2024-25 file (see build_demographics) and never written to output.
 # Note: we do NOT block "id" alone — false-positive risk on dashboard keys like "covid".
 
 # PII regex patterns — values matching these are scrubbed from any field.
@@ -130,15 +130,6 @@ PILLAR_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
                          "reflux", "pcos", "ibs")),
 ]
 
-# Mapping from "month-bucket YYYY-MM" to dashboard's "academic year" labels.
-def academic_year(period: pd.Period) -> str:
-    """Return academic-year label like '2023' for visits in 2023-01..2023-06
-    and 2022-07..2022-12 plus 2023-07..2023-12. Used to mirror the dashboard's
-    per-year status aggregation, which labels by calendar year of visit.
-    """
-    return str(period.year)
-
-
 # ──────────────────────────────────────────────────────────────────────
 # Loading
 # ──────────────────────────────────────────────────────────────────────
@@ -167,24 +158,9 @@ def _parse_time(series: pd.Series) -> pd.Series:
     return parsed.fillna(fallback)
 
 
-def _scrub_pii(value: Any) -> Any:
-    """Remove any PII-pattern substring from a single value."""
-    if not isinstance(value, str):
-        return value
-    out = value
-    for pat in PII_PATTERNS:
-        out = pat.sub("", out)
-    return out
-
-
 def _drop_pii_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Drop any column whose name contains a forbidden fragment."""
-    keep = []
-    for c in df.columns:
-        cn = c.replace("_", " ")
-        if any(frag in cn for frag in FORBIDDEN_COL_FRAGMENTS):
-            continue
-        keep.append(c)
+    keep = [c for c in df.columns if not any(frag in c for frag in FORBIDDEN_COL_FRAGMENTS)]
     return df[keep]
 
 
