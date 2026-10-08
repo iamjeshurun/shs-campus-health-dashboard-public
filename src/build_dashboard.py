@@ -113,16 +113,17 @@ CPT_TO_VISIT_TYPE = {
 }
 
 # Health-pillar classification (keyword → pillar).
-# Order matters: first match wins.
+# Order matters: first match wins. Preventive comes before Infectious Disease so that
+# "Flu vaccine need" counts as a vaccination, not as influenza.
 PILLAR_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
     ("Mental Health", ("anxiety", "depression", "mood", "adhd",
                        "attention", "psychiatric", "mental")),
+    ("Preventive / Wellness", ("physical", "screening", "vaccine", "vaccin",
+                               "well woman", "contracepti", "pap",
+                               "immuniz", "sti screening", "wellness")),
     ("Infectious Disease", ("sore throat", "cough", "pharyngitis", "strep",
                             "flu", "influenza", "covid", "viral", "fever",
                             "sinusitis", "respiratory infection", "uri")),
-    ("Preventive / Wellness", ("physical", "screening", "vaccine", "vaccin",
-                               "well woman", "contraceptive", "pap",
-                               "immuniz", "sti screening", "wellness")),
     ("Musculoskeletal", ("pain", "sprain", "strain", "injury", "fracture",
                          "back", "joint", "muscle", "spasm", "arthritis")),
     ("Chronic Disease", ("diabetes", "hypertension", "hyperlipid",
@@ -295,7 +296,11 @@ def is_covid(dx: str) -> bool:
 
 
 def is_flu(dx: str) -> bool:
+    """Influenza diagnoses. Flu vaccinations ("Flu vaccine need", Z23) are preventive
+    visits, not cases, so they are excluded."""
     dl = (dx or "").lower()
+    if "vaccin" in dl or "immuniz" in dl:
+        return False
     return ("influenza" in dl or "flu" == dl.strip() or dl.strip().startswith("flu ")
             or "flu," in dl or "flu." in dl)
 

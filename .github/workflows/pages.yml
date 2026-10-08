@@ -46,7 +46,7 @@ jobs:
         run: |
           mkdir _site
           cp SHS_Dashboard.html _site/index.html
-          cp vendor/CHARTJS_LICENSE.md _site/CHARTJS_LICENSE.md
+          cp vendor/ARCHIVO_OFL.txt _site/ARCHIVO_OFL.txt
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6

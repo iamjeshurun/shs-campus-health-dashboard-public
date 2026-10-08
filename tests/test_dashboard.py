@@ -108,6 +108,45 @@ class TestPiiColumnFilter(unittest.TestCase):
         )
 
 
+class TestDiagnosisClassification(unittest.TestCase):
+    """Keyword classifiers behind the infectious-disease series."""
+
+    def test_flu_vaccinations_are_not_counted_as_influenza(self):
+        sys.path.insert(0, str(ROOT / "src"))
+        from build_dashboard import is_flu
+
+        self.assertTrue(is_flu("Influenza"))
+        self.assertTrue(is_flu("J11.1 - INFLUENZA DUE TO UNIDENTIFIED VIRUS"))
+        self.assertFalse(is_flu("Flu vaccine need"))
+        self.assertFalse(is_flu("Z23 - ENCOUNTER FOR IMMUNIZATION, FLU"))
+
+    def test_vaccinations_and_contraception_are_preventive(self):
+        sys.path.insert(0, str(ROOT / "src"))
+        from build_dashboard import classify_pillar
+
+        self.assertEqual(classify_pillar("Flu vaccine need"), "Preventive / Wellness")
+        self.assertEqual(classify_pillar("Contraception counseling"), "Preventive / Wellness")
+        self.assertEqual(classify_pillar("Influenza"), "Infectious Disease")
+        self.assertEqual(classify_pillar("Anxiety"), "Mental Health")
+
+
+class TestSyntheticGenerator(unittest.TestCase):
+    """The public demo's inputs come from a seeded model of an academic calendar."""
+
+    def test_calendar_shapes_daily_volume(self):
+        from datetime import date
+
+        sys.path.insert(0, str(ROOT / "src"))
+        from generate_synthetic_data import TERM_FACTOR, WEEKDAY_FACTOR, term_position
+
+        self.assertEqual(term_position(date(2023, 10, 4))[0], "fall")
+        self.assertEqual(term_position(date(2023, 12, 26))[0], "winter_break")
+        self.assertEqual(term_position(date(2024, 3, 11))[0], "short_break")  # spring break week
+        self.assertEqual(term_position(date(2024, 6, 12))[0], "summer")
+        self.assertGreater(TERM_FACTOR["fall"], TERM_FACTOR["summer"])
+        self.assertEqual(WEEKDAY_FACTOR[5:], [0.0, 0.0])  # closed at weekends
+
+
 class TestSuppression(unittest.TestCase):
     """Aggregated cells must respect k-anonymity threshold."""
 

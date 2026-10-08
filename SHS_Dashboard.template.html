@@ -3,806 +3,732 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Stetson Health Services · Campus Health Dashboard</title>
-<!--CHART_JS_INJECTION_POINT-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<!--/CHART_JS_INJECTION_POINT-->
+<title>SHS Campus Health Observatory: synthetic public demo</title>
+<meta name="description" content="A privacy-first student health dashboard, shown with generated data: 11,834 synthetic clinic appointments, aggregated with small-count suppression."/>
 <style>
-  :root {
-    --teal:    #028090;
-    --teal-lt: #02c39a;
-    --navy:    #065a82;
-    --dark:    #0d1b2a;
-    --warn:    #e5383b;
-    --amber:   #fb8500;
-    --ink:     #1c2b3a;
-    --mist:    #eaf6f6;
-    --mid:     #8fa8b2;
-    --white:   #ffffff;
-    --card:    #f7fbfc;
-    --border:  #d0e8ec;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: #f0f7f9;
-    color: var(--ink);
-    min-height: 100vh;
-  }
-  .skip-link {
-    position: fixed; left: 1rem; top: 0.5rem; z-index: 1000;
-    background: white; color: var(--dark); padding: 0.65rem 1rem;
-    border-radius: 6px; transform: translateY(-160%);
-  }
-  .skip-link:focus { transform: translateY(0); }
+/* Archivo, SIL Open Font License 1.1 (see vendor/ARCHIVO_OFL.txt). Embedded by src/embed_data.py so the page works offline. */
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 400 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  /*FONT_INJECTION_POINT*/src: local("Archivo");/*/FONT_INJECTION_POINT*/
+}
+:root {
+  --ink: #111111;
+  --ink-2: #3D3D3D;
+  --muted: #555555;
+  --line: #D9D9D9;
+  --paper: #FFFFFF;
+  --tint: #F4F4F2;
+  --fall: #E8443A;
+  --spring: #2D5BE3;
+  --summer: #F7C531;
+  --gutter: clamp(16px, 4vw, 48px);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.55 "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif; }
+h1, h2, h3, p, ul, ol, figure, dl, dd { margin: 0; }
+a { color: var(--ink); text-underline-offset: 3px; }
+button { font: inherit; color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--gutter); }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 10; padding: 10px 14px; background: var(--ink); color: #fff; font-weight: 700; }
+.skip-link:focus { top: 12px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tag { padding: 0 5px; font-weight: 700; white-space: nowrap; }
+.tag.fall { background: var(--fall); color: #fff; }
+.tag.spring { background: var(--spring); color: #fff; }
+.tag.summer { background: var(--summer); color: var(--ink); }
 
-  /* ── HEADER ── */
-  header {
-    background: var(--dark);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    position: sticky; top: 0; z-index: 100;
-    border-bottom: 3px solid var(--teal);
-  }
-  .logo {
-    display: flex; align-items: center; gap: 12px;
-  }
-  .logo-mark {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--teal), var(--teal-lt));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700; color: white;
-  }
-  .logo-text { font-family: 'DM Serif Display', serif; color: white; font-size: 1.1rem; }
-  .logo-sub  { font-size: 0.7rem; color: var(--mid); letter-spacing: 0.08em; text-transform: uppercase; }
-  .header-badge {
-    background: rgba(2,128,144,0.25); border: 1px solid var(--teal);
-    color: var(--teal-lt); padding: 4px 12px; border-radius: 20px;
-    font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
-  }
+/* Banner and header */
+.banner { background: var(--ink); color: #fff; padding: 12px 0; font-size: 15px; line-height: 1.45; }
+.banner strong { font-weight: 800; font-stretch: 110%; }
+.site-header { position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); }
+.site-header .wrap { display: flex; align-items: center; gap: 24px; min-height: 60px; }
+.brand { font-weight: 800; font-stretch: 112%; font-size: 17px; white-space: nowrap; }
+.section-nav { display: flex; gap: 18px; margin-left: auto; overflow-x: auto; font-size: 14px; font-weight: 600; scrollbar-width: none; }
+.section-nav::-webkit-scrollbar { display: none; }
+.section-nav a { text-decoration: none; white-space: nowrap; padding: 6px 0; border-bottom: 2px solid transparent; }
+.section-nav a:hover, .section-nav a[aria-current="true"] { border-bottom-color: var(--ink); }
 
-  /* ── NAV TABS ── */
-  nav {
-    background: white;
-    border-bottom: 2px solid var(--border);
-    padding: 0 2rem;
-    display: flex; gap: 0; overflow-x: auto;
-  }
-  nav button {
-    background: none; border: none; cursor: pointer;
-    padding: 14px 20px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
-    font-weight: 500; color: var(--mid); white-space: nowrap;
-    border-bottom: 3px solid transparent; margin-bottom: -2px;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  nav button:hover { color: var(--teal); }
-  nav button.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 600; }
-  nav button:focus-visible, .hm-toggle button:focus-visible {
-    outline: 3px solid var(--amber); outline-offset: 2px;
-  }
+/* Buttons */
+.btn { min-height: 44px; padding: 0 18px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); font-size: 15px; font-weight: 800; cursor: pointer; }
+.btn.solid { background: var(--ink); color: #fff; }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.link-btn { border: 0; background: none; padding: 8px; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.toggle { display: inline-flex; gap: 4px; padding: 3px; border: 2px solid var(--ink); border-radius: 999px; }
+.toggle button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; font-size: 14px; font-weight: 700; cursor: pointer; }
+.toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 
-  /* ── LAYOUT ── */
-  main { max-width: 1300px; margin: 0 auto; padding: 2rem; }
-  .section { display: none; animation: fadein 0.3s ease; }
-  .section.active { display: block; }
-  @keyframes fadein { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+/* Opening */
+.opening { padding: 24px 0 40px; }
+.opening-head { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; align-items: end; }
+.opening h1 { font-size: clamp(42px, 5.4vw, 78px); line-height: .92; letter-spacing: -0.04em; font-weight: 900; font-stretch: 88%; }
+.explain { font-size: 17px; }
+.explain p + p { margin-top: 10px; }
+.explain .step-no { font-size: 14px; font-weight: 700; color: var(--muted); }
+.explain h2 { margin-top: 4px; font-size: 27px; line-height: 1.1; font-weight: 900; font-stretch: 92%; letter-spacing: -0.02em; }
+.explain .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+.explain .walk { margin-top: 16px; }
+.lede-short { display: none; font-size: 15px; }
+.chart-rule { margin-top: 32px; border-top: 3px solid var(--ink); padding-top: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; }
+.chart-rule figcaption, .chart-rule .cap { font-size: 15px; font-weight: 800; }
+.readout { font-size: 16px; }
+.field { position: relative; margin-top: 14px; cursor: crosshair; }
+.field svg { display: block; width: 100%; height: auto; overflow: visible; }
+.col { transform-box: fill-box; transform-origin: 50% 100%; transition: opacity .25s ease; }
+.grow .col { animation: grow 700ms cubic-bezier(.2,.8,.2,1) both; }
+@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.years { position: relative; height: 40px; margin-top: 8px; }
+.years span { position: absolute; top: 0; border-top: 2px solid var(--ink); padding-top: 6px; font-size: 14px; font-weight: 700; transition: opacity .25s; }
+.slider { display: flex; align-items: center; gap: 16px; margin-top: 4px; font-size: 14px; font-weight: 700; }
+.slider input { flex: 1; accent-color: var(--ink); height: 28px; }
+.phone-field { display: none; }
+.year-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+.year-chips button { min-height: 40px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); font-size: 14px; font-weight: 800; cursor: pointer; }
+.year-chips button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.month-buttons { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); margin-top: 4px; }
+.month-buttons button { min-height: 40px; padding: 0; border: 0; border-top: 2px solid var(--line); background: transparent; font-size: 11px; font-weight: 600; cursor: pointer; }
+.month-buttons button[aria-pressed="true"] { border-top-color: var(--ink); font-weight: 800; }
+.explain-after { display: none; }
 
-  /* ── KPI STRIP ── */
-  .kpi-strip {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 1rem; margin-bottom: 2rem;
-  }
-  .kpi {
-    background: white; border-radius: 12px; padding: 1.2rem 1.4rem;
-    border-left: 4px solid var(--teal);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    transition: transform 0.15s;
-  }
-  .kpi:hover { transform: translateY(-2px); }
-  .kpi.warn { border-left-color: var(--warn); }
-  .kpi.amber { border-left-color: var(--amber); }
-  .kpi.navy { border-left-color: var(--navy); }
-  .kpi.green { border-left-color: var(--teal-lt); }
-  .kpi-val { font-family: 'DM Serif Display', serif; font-size: 2.1rem; color: var(--dark); line-height: 1; }
-  .kpi-label { font-size: 0.75rem; color: var(--mid); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-  .kpi-note { font-size: 0.72rem; color: var(--teal); margin-top: 4px; }
+/* Sections */
+.section { padding: 72px 0; border-top: 1px solid var(--line); }
+.section-head { max-width: 860px; }
+.kicker { font-size: 15px; font-weight: 700; color: var(--muted); }
+.section h2 { margin-top: 6px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.03em; font-weight: 900; font-stretch: 90%; }
+.section-head > p { margin-top: 14px; font-size: 18px; color: var(--ink-2); }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 40px; margin-top: 36px; }
+.chart { margin-top: 36px; }
+.grid-2 .chart { margin-top: 0; }
+.chart h3 { font-size: 19px; line-height: 1.25; font-weight: 800; }
+.chart .sub { margin-top: 4px; font-size: 14px; color: var(--muted); }
+.chart .guide { margin-top: 12px; font-size: 15px; color: var(--ink-2); max-width: 760px; }
+.chart .guide strong { color: var(--ink); }
+.source { margin-top: 12px; font-size: 13px; color: var(--muted); }
+details.numbers { margin-top: 10px; font-size: 14px; }
+details.numbers summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+details.numbers table { border-collapse: collapse; margin-top: 6px; min-width: 260px; }
+details.numbers th, details.numbers td { padding: 4px 12px 4px 0; text-align: left; border-bottom: 1px solid var(--line); }
+details.numbers td.n { text-align: right; font-variant-numeric: tabular-nums; }
+.table-scroll { overflow-x: auto; }
 
-  /* ── CARDS ── */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-  @media(max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-  .card {
-    background: white; border-radius: 14px; padding: 1.5rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .card-full { grid-column: 1 / -1; }
-  .card h3 {
-    font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--navy);
-    margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
-  }
-  .card h3 span { font-size: 1.1rem; }
-  .section-title {
-    font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--dark);
-    margin-bottom: 1.5rem; padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--border);
-  }
+/* Bars (HTML) */
+.bars { margin-top: 16px; display: grid; gap: 8px; }
+.bar-row { display: grid; grid-template-columns: minmax(120px, 34%) minmax(0, 1fr) 64px; gap: 12px; align-items: center; font-size: 15px; }
+.bar-row .label { line-height: 1.25; }
+.bar-track { display: block; height: 22px; background: var(--tint); }
+.bar-fill { display: block; height: 100%; background: var(--ink); transform-origin: left; transform: scaleX(var(--s, 1)); transition: transform 900ms cubic-bezier(.2,.8,.2,1); }
+.bar-row .value { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.reveal:not(.in) .bar-fill { transform: scaleX(0); }
+.pair .bar-track { height: auto; background: none; display: grid; gap: 3px; }
+.pair .bar-fill { height: 12px; }
+.pair .bar-fill.b { background: var(--spring); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font-size: 14px; font-weight: 600; }
+.legend i { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; }
 
-  /* ── HEATMAP ── */
-  .heatmap-wrap { overflow-x: auto; }
-  .heatmap {
-    display: grid;
-    grid-template-columns: 90px repeat(9, 1fr);
-    gap: 4px; min-width: 520px;
-  }
-  .hm-cell {
-    height: 38px; border-radius: 6px; display: flex;
-    align-items: center; justify-content: center;
-    font-size: 0.72rem; font-weight: 600; cursor: default;
-    transition: transform 0.1s;
-  }
-  .hm-cell:hover { transform: scale(1.08); z-index: 1; }
-  .hm-label { background: none; color: var(--mid); font-size: 0.72rem; font-weight: 600; justify-content: flex-end; padding-right: 8px; }
-  .hm-header { background: none; color: var(--mid); font-size: 0.7rem; font-weight: 700; }
-  .hm-toggle { display: flex; gap: 8px; margin-bottom: 1rem; }
-  .hm-toggle button {
-    padding: 5px 14px; border-radius: 20px; border: 2px solid var(--border);
-    background: white; cursor: pointer; font-family: 'DM Sans',sans-serif;
-    font-size: 0.78rem; font-weight: 600; color: var(--mid);
-    transition: all 0.15s;
-  }
-  .hm-toggle button.active { background: var(--teal); border-color: var(--teal); color: white; }
+/* Stacked outcome bars */
+.stack-row { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; align-items: center; margin-top: 12px; }
+.stack-row .label { font-weight: 800; font-size: 15px; line-height: 1.2; }
+.stack-row .label small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+.stack { display: flex; height: 44px; }
+.stack span { display: flex; align-items: center; padding: 0 8px; overflow: hidden; white-space: nowrap; font-size: 13px; font-weight: 700; color: #fff; }
+.stack .completed { background: var(--ink); }
+.stack .canceled { background: #8A8A8A; }
+.stack .noshow { background: var(--fall); }
 
-  /* ── TOP DIAGNOSES ── */
-  .diag-bar { margin-bottom: 10px; }
-  .diag-label { font-size: 0.8rem; color: var(--ink); margin-bottom: 3px; display: flex; justify-content: space-between; }
-  .diag-track { background: var(--mist); border-radius: 4px; height: 10px; overflow: hidden; }
-  .diag-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--teal), var(--teal-lt)); transition: width 0.8s cubic-bezier(.4,0,.2,1); }
-  .diag-fill.mental { background: linear-gradient(90deg, var(--navy), #1c7293); }
-  .diag-fill.infectious { background: linear-gradient(90deg, var(--warn), #f4845f); }
-  .diag-fill.wellness { background: linear-gradient(90deg, var(--teal-lt), #00b4d8); }
+/* Heatmap table */
+.heat { margin-top: 16px; border-collapse: separate; border-spacing: 3px; width: 100%; table-layout: fixed; }
+.heat th { font-size: 13px; font-weight: 700; color: var(--muted); padding: 2px; }
+.heat th[scope="row"] { text-align: left; }
+.heat .corner { width: 52px; }
+.heat td { height: 44px; text-align: center; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-  /* ── LEGEND ── */
-  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--mid); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+/* Small multiples */
+.multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 32px; margin-top: 28px; }
+.multiples svg { display: block; width: 100%; height: auto; overflow: visible; }
+.multiples h3 { font-size: 17px; }
 
-  /* ── INSIGHT BOX ── */
-  .insight {
-    background: linear-gradient(135deg, #eaf6f6, #d0f0ea);
-    border-left: 4px solid var(--teal-lt); border-radius: 10px;
-    padding: 1rem 1.2rem; margin-top: 1rem; font-size: 0.83rem;
-    color: var(--navy); line-height: 1.6;
-  }
-  .insight strong { color: var(--teal); }
+/* Method */
+.steps { list-style: none; padding: 0; margin-top: 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0; border-top: 3px solid var(--ink); }
+.steps li { padding: 16px 16px 16px 0; border-bottom: 1px solid var(--line); }
+.steps b { display: block; font-size: 15px; font-weight: 800; }
+.steps span { display: block; margin-top: 4px; font-size: 14px; color: var(--ink-2); }
+.cols-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 32px; margin-top: 36px; }
+.cols-3 h3 { font-size: 18px; font-weight: 800; }
+.cols-3 p, .cols-3 ul { margin-top: 8px; font-size: 15px; color: var(--ink-2); }
+.cols-3 ul { padding-left: 18px; display: grid; gap: 6px; }
+.site-footer { padding: 28px 0 48px; border-top: 3px solid var(--ink); font-size: 14px; color: var(--muted); }
 
-  /* ── RACE/GENDER TABLE ── */
-  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; }
-  .demo-pill {
-    background: var(--mist); border-radius: 10px; padding: 12px 10px; text-align: center;
-    border: 1px solid var(--border);
-  }
-  .demo-pill-val { font-family: 'DM Serif Display',serif; font-size: 1.5rem; color: var(--navy); }
-  .demo-pill-label { font-size: 0.68rem; color: var(--mid); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+.reveal { transition: opacity 600ms ease, transform 600ms ease; }
+.js .reveal:not(.in) { opacity: 0; transform: translateY(24px); }
 
-  canvas { max-height: 280px; }
-  @media(max-width: 600px) {
-    header { height: auto; min-height: 64px; padding: 0.75rem 1rem; gap: 0.75rem; }
-    .header-badge { display: none; }
-    nav { padding: 0 0.5rem; }
-    nav button { padding: 12px 14px; }
-    main { padding: 1rem; }
-    .card { padding: 1rem; }
-    .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .kpi { padding: 1rem; }
-    .kpi-val { font-size: 1.6rem; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  }
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .banner { font-size: 13px; padding: 10px 0; }
+  .site-header .wrap { min-height: 52px; gap: 14px; }
+  .brand { font-size: 14px; }
+  .section-nav { display: none; }
+  .opening { padding-top: 14px; }
+  .opening-head { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .opening h1 { font-size: 42px; font-stretch: 85%; }
+  .opening-head .explain { display: none; }
+  .lede-short { display: block; }
+  .chart-rule { margin-top: 16px; }
+  .desk-field, .slider, .chart-rule .readout { display: none; }
+  .phone-field { display: block; }
+  .explain-after { display: block; margin-top: 16px; padding: 16px; border: 2px solid var(--ink); border-radius: 12px; font-size: 15px; }
+  .explain-after h2 { font-size: 24px; }
+  .section { padding: 48px 0; }
+  .bar-row { grid-template-columns: minmax(96px, 38%) minmax(0, 1fr) 52px; gap: 8px; font-size: 14px; }
+  .heat td { height: 36px; font-size: 11px; }
+  .heat th { font-size: 11px; }
+  .stack span { font-size: 11px; padding: 0 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .grow .col { animation: none; }
+  .reveal, .bar-fill, .col { transition: none !important; }
+  .js .reveal:not(.in) { opacity: 1; transform: none; }
+  .reveal:not(.in) .bar-fill { transform: scaleX(var(--s, 1)); }
+}
 </style>
 </head>
 <body>
-
-<a class="skip-link" href="#dashboard-main">Skip to dashboard content</a>
-<header>
-  <div class="logo">
-    <div class="logo-mark">S</div>
-    <div>
-      <div class="logo-text">Stetson Health Services</div>
-      <div class="logo-sub">Campus Health Analytics · 2019 – 2025</div>
-    </div>
+<a class="skip-link" href="#dashboard-main">Skip to the data</a>
+<div class="banner" role="note" aria-label="Synthetic public demo">
+  <div class="wrap"><strong>Synthetic public demo.</strong> Every number on this page is generated. None describes Stetson University patients, and nothing here supports causal or clinical claims. Counts below 5 are suppressed before publishing.</div>
+</div>
+<header class="site-header">
+  <div class="wrap">
+    <span class="brand">SHS Campus Health Observatory</span>
+    <nav class="section-nav" aria-label="Sections">
+      <a href="#rhythm">Rhythm</a>
+      <a href="#busiest">Busiest hours</a>
+      <a href="#outcomes">Outcomes</a>
+      <a href="#illness">Seasonal illness</a>
+      <a href="#reasons">Diagnoses</a>
+      <a href="#who">Who books</a>
+      <a href="#method">Method and privacy</a>
+    </nav>
   </div>
-  <div class="header-badge">Internship Dashboard</div>
 </header>
 
-<nav aria-label="Dashboard sections" role="tablist">
-  <button id="tab-button-overview" type="button" class="active" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-overview" onclick="showTab('overview',this)">📊 Overview</button>
-  <button id="tab-button-volume" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-volume" onclick="showTab('volume',this)">📈 Visit Volume</button>
-  <button id="tab-button-infectious" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-infectious" onclick="showTab('infectious',this)">🦠 Infectious Disease</button>
-  <button id="tab-button-operations" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-operations" onclick="showTab('operations',this)">⏱ Operations</button>
-  <button id="tab-button-diagnoses" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-diagnoses" onclick="showTab('diagnoses',this)">🩺 Top Diagnoses</button>
-  <button id="tab-button-demographics" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-demographics" onclick="showTab('demographics',this)">👥 Demographics</button>
-</nav>
-
 <main id="dashboard-main" tabindex="-1">
+<section class="opening" id="rhythm" aria-labelledby="opening-title">
+  <div class="wrap">
+    <div class="opening-head">
+      <h1 id="opening-title" class="num">11,834 clinic appointments that never happened.</h1>
+      <div class="explain" id="explain-desk"></div>
+      <p class="lede-short">A privacy-first dashboard built for a university student health clinic, shown with <strong>generated data</strong> instead of patient records.</p>
+    </div>
 
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- OVERVIEW -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-overview" class="section active" role="tabpanel" aria-labelledby="tab-button-overview">
-  <div class="kpi-strip" id="kpi-strip"></div>
-  <div class="grid-2">
-    <div class="card">
-      <h3><span>📈</span> Monthly Visit Volume (All Years)</h3>
-      <canvas id="ov-volume"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>🏥</span> Health Pillar Distribution (2019–2022)</h3>
-      <canvas id="ov-pillar"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>✅</span> Appointment Status by Year</h3>
-      <canvas id="ov-status"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>🩺</span> Top 10 Diagnoses (2023–2025)</h3>
-      <canvas id="ov-diag"></canvas>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- VOLUME -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-volume" class="section" role="tabpanel" aria-labelledby="tab-button-volume" hidden>
-  <div class="section-title">Visit Volume Analysis</div>
-  <div class="kpi-strip" id="volume-kpis"></div>
-  <div class="card" style="margin-bottom:1.5rem">
-    <h3><span>📈</span> Full Longitudinal Volume — Sep 2019 to Jun 2025</h3>
-    <canvas id="vol-full" style="max-height:320px"></canvas>
-    <div class="insight">
-      Monthly counts below the privacy threshold are shown as zero. Use the visible
-      seasonal pattern as a planning aid; operational changes should be validated
-      against current staffing, appointment capacity, and unsuppressed internal data.
-    </div>
-  </div>
-  <div class="grid-2">
-    <div class="card">
-      <h3><span>🗂</span> Visit Types — 2023 vs 2024–25</h3>
-      <canvas id="vol-types"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>🎯</span> ADHD Visit Trend (2023–2025)</h3>
-      <canvas id="vol-adhd"></canvas>
-      <div class="insight" style="font-size:0.78rem">
-        Counts below five are suppressed to protect privacy. If sufficient internal data are
-        available, compare appointment modality and follow-up demand before testing any
-        scheduling change.
+    <figure>
+      <div class="chart-rule">
+        <figcaption>Synthetic appointments per month, Sep 2019 to Jun 2025. One dot is one appointment.</figcaption>
+        <p class="readout num" id="readout" aria-live="polite"></p>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- INFECTIOUS -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-infectious" class="section" role="tabpanel" aria-labelledby="tab-button-infectious" hidden>
-  <div class="section-title">Infectious Disease Surveillance</div>
-  <div class="kpi-strip" id="infectious-kpis"></div>
-  <div class="card" style="margin-bottom:1.5rem">
-    <h3><span>🦠</span> COVID-19 · Influenza · Strep / Pharyngitis (Monthly, 2023–2025)</h3>
-    <canvas id="inf-triple" style="max-height:320px"></canvas>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#e5383b"></div>COVID-19</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#fb8500"></div>Influenza</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#028090"></div>Strep / Pharyngitis</div>
-    </div>
-  </div>
-  <div class="grid-2">
-    <div class="card">
-      <h3><span>📉</span> COVID-19 Trend</h3>
-      <canvas id="inf-covid"></canvas>
-      <div class="insight" style="font-size:0.78rem">
-        Counts below five are suppressed to zero. The chart describes recorded
-        encounters and does not establish disease severity, immunity, or vaccination effects.
+      <div class="desk-field">
+        <div class="field" id="field"></div>
+        <div class="years" id="year-brackets" aria-hidden="true"></div>
+        <label class="slider">Read a month <input type="range" id="month-slider" min="0" max="0" step="1" value="0"/></label>
       </div>
-    </div>
-    <div class="card">
-      <h3><span>🤧</span> Influenza Seasonality</h3>
-      <canvas id="inf-flu"></canvas>
-      <div class="insight" style="font-size:0.78rem">
-        Recorded influenza encounters vary by month. Use the observed peaks to form
-        planning hypotheses, then validate interventions with current clinical guidance.
+      <div class="phone-field">
+        <div class="year-chips" id="year-chips" role="group" aria-label="Academic year"></div>
+        <div class="field" id="phone-field"></div>
+        <div class="month-buttons" id="month-buttons"></div>
+        <p class="num" id="phone-readout" aria-live="polite" style="margin-top:8px;font-size:14px;min-height:21px"></p>
       </div>
-    </div>
+    </figure>
+    <div class="explain explain-after" id="explain-phone"></div>
+    <p class="source">Source: synthetic appointment records from the project's generator (seed 20250630), counted by its build after the three exports are reconciled. From 2023 the records include canceled and no-show bookings; the 2019–2022 export has no outcome field, so those years cannot be split into kept and missed appointments. Every monthly total shown is 5 or more. Smaller breakdowns follow the k = 5 rule: a count under 5 is published as 0 or folded into Other, so a published 0 can mean none or fewer than five.</p>
   </div>
-</div>
+</section>
 
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- OPERATIONS -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-operations" class="section" role="tabpanel" aria-labelledby="tab-button-operations" hidden>
-  <div class="section-title">Operational Analytics</div>
-  <div class="kpi-strip" id="operations-kpis"></div>
-  <div class="card" style="margin-bottom:1.5rem">
-    <h3><span>🔥</span> Appointment Density Heatmap — Combined 2023 & 2024–25</h3>
-    <div class="hm-toggle">
-      <button type="button" class="active" aria-pressed="true" onclick="switchHeatmap('total',this)">Total Appointments</button>
-      <button type="button" aria-pressed="false" onclick="switchHeatmap('noshow',this)">No-Shows Only</button>
+<section class="section" id="busiest" aria-labelledby="busiest-title">
+  <div class="wrap reveal">
+    <div class="section-head">
+      <p class="kicker">Weekly pattern</p>
+      <h2 id="busiest-title">Mornings early in the week are the busiest hours.</h2>
+      <p>Appointments by weekday and starting hour, January 2023 to June 2025. The generator makes Mondays busiest and lunchtime quiet, so this shows how the table reads rather than how any real clinic runs.</p>
     </div>
-    <div class="heatmap-wrap">
-      <div class="heatmap" id="heatmap-grid"></div>
-    </div>
-    <div class="insight" style="margin-top:1rem">
-      Darker cells indicate higher recorded volume. Suppressed cells are displayed as blank;
-      use this view to identify periods for further operational review, not as an automatic
-      staffing or overbooking recommendation.
-    </div>
-  </div>
-  <div class="grid-2">
-    <div class="card">
-      <h3><span>✅</span> Appointment Status Trend</h3>
-      <canvas id="ops-status"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>📋</span> No-Show Rate by Year</h3>
-      <canvas id="ops-noshow"></canvas>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- DIAGNOSES -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-diagnoses" class="section" role="tabpanel" aria-labelledby="tab-button-diagnoses" hidden>
-  <div class="section-title">Top Diagnoses & Health Pillars</div>
-  <div class="grid-2">
-    <div class="card">
-      <h3><span>🏥</span> Health Pillar Breakdown (2019–2022 Baseline)</h3>
-      <canvas id="dx-pillar"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>📊</span> Top 20 Encounter Diagnoses (2023–2025)</h3>
-      <div id="dx-bars" style="overflow-y:auto;max-height:300px;padding-right:4px"></div>
-    </div>
-  </div>
-  <div class="card">
-    <h3><span>💬</span> Diagnosis Category Analysis</h3>
-    <div class="grid-3" style="margin-top:0.5rem">
-      <div style="padding:1rem;background:var(--mist);border-radius:10px;border-left:4px solid var(--teal)">
-        <div style="font-weight:700;color:var(--teal);margin-bottom:6px">Infectious Disease</div>
-        <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
-          Published diagnosis counts are classified using infectious-disease keywords.
-          Use the generated ranking and monthly chart to inspect the synthetic demo pattern.
+    <div class="chart">
+      <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between">
+        <h3 id="heat-title">Total appointments by weekday and hour</h3>
+        <div class="toggle" role="group" aria-label="What to count">
+          <button type="button" id="heat-total" aria-pressed="true">Total Appointments</button>
+          <button type="button" id="heat-noshow" aria-pressed="false">No-Shows Only</button>
         </div>
       </div>
-      <div style="padding:1rem;background:#eef0fb;border-radius:10px;border-left:4px solid var(--navy)">
-        <div style="font-weight:700;color:var(--navy);margin-bottom:6px">Mental Health</div>
-        <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
-          Anxiety, depression, mood, and attention-related descriptions are grouped for
-          descriptive analysis. Categories may overlap within a single encounter.
-        </div>
-      </div>
-      <div style="padding:1rem;background:#fef6ea;border-radius:10px;border-left:4px solid var(--amber)">
-        <div style="font-weight:700;color:var(--amber);margin-bottom:6px">Preventive / Wellness</div>
-        <div style="font-size:0.82rem;color:var(--ink);line-height:1.6">
-          Physicals, screenings, vaccinations, and wellness visits are grouped as preventive
-          care. Cross-period growth is not inferred from this view.
-        </div>
-      </div>
-    </div>
-    <div class="insight" style="margin-top:1rem">
-      <strong>Interpretation:</strong> Diagnosis groupings are descriptive and may include
-      overlapping encounter diagnoses. They do not by themselves establish prevalence,
-      clinical severity, causality, or service priorities.
+      <p class="sub">Darker cells hold more appointments. The number in each cell is its count.</p>
+      <div class="table-scroll"><table class="heat num" id="heatmap" aria-describedby="heat-title"></table></div>
+      <p class="guide" id="heat-guide"></p>
+      <p class="source">Hours run 8 a.m. to 4 p.m., Monday to Friday; the clinic is closed at weekends in the generator. A cell showing 0 had fewer than five appointments, or none: the build publishes both the same way, so a small count cannot be singled out.</p>
     </div>
   </div>
-</div>
+</section>
 
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- DEMOGRAPHICS -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<div id="tab-demographics" class="section" role="tabpanel" aria-labelledby="tab-button-demographics" hidden>
-  <div class="section-title">Patient Demographics</div>
-  <div class="grid-2">
-    <div class="card">
-      <h3><span>⚧</span> Gender Identity — 2023</h3>
-      <canvas id="dem-gender23"></canvas>
+<section class="section" id="outcomes" aria-labelledby="outcomes-title">
+  <div class="wrap reveal">
+    <div class="section-head">
+      <p class="kicker">Appointment outcomes</p>
+      <h2 id="outcomes-title">About one appointment in nine ends as a no-show.</h2>
+      <p>What happened to each booked appointment, by calendar year. 2025 covers January to June only.</p>
     </div>
-    <div class="card">
-      <h3><span>⚧</span> Gender Identity — 2024–25</h3>
-      <canvas id="dem-gender2425"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>🌍</span> Patient Race — 2023</h3>
-      <canvas id="dem-race23"></canvas>
-    </div>
-    <div class="card">
-      <h3><span>🌍</span> Patient Race — 2024–25</h3>
-      <canvas id="dem-race2425"></canvas>
+    <div class="chart">
+      <h3>Completed, canceled and no-show appointments, share of each year</h3>
+      <div id="outcome-bars"></div>
+      <div class="legend" aria-hidden="true"><span><i style="background:var(--ink)"></i>Completed</span><span><i style="background:#8A8A8A"></i>Canceled</span><span><i style="background:var(--fall)"></i>No-show</span></div>
+      <p class="guide" id="outcome-guide"></p>
+      <details class="numbers"><summary>Show the numbers</summary><div class="table-scroll"><table id="outcome-table"></table></div></details>
+      <p class="source">Source: appointment status in the 2023 and 2024–25 synthetic exports. The 2019–2022 export has no status field.</p>
     </div>
   </div>
-  <div class="card">
-    <h3><span>📋</span> Demographic Summary</h3>
-    <div class="insight" id="demographic-summary"></div>
-  </div>
-</div>
+</section>
 
+<section class="section" id="illness" aria-labelledby="illness-title">
+  <div class="wrap reveal">
+    <div class="section-head">
+      <p class="kicker">Seasonal illness</p>
+      <h2 id="illness-title">Respiratory illness clusters in winter.</h2>
+      <p>Monthly appointments with each diagnosis, January 2023 to June 2025. Flu vaccinations are not counted as influenza. The winter season is part of the generator's model, not an observed outbreak.</p>
+    </div>
+    <div class="multiples" id="illness-charts"></div>
+    <p class="guide" style="margin-top:20px;max-width:860px;font-size:15px">A month at 0 had fewer than five appointments with that diagnosis, or none. Both are published as 0 so a small count cannot be singled out.</p>
+    <details class="numbers"><summary>Show the numbers</summary><div class="table-scroll"><table id="illness-table"></table></div></details>
+  </div>
+</section>
+
+<section class="section" id="reasons" aria-labelledby="reasons-title">
+  <div class="wrap reveal">
+    <div class="section-head">
+      <p class="kicker">Diagnoses</p>
+      <h2 id="reasons-title">Respiratory illness and mental health lead the diagnoses.</h2>
+      <p>Each export describes diagnoses differently, so the build reconciles them first. Older records carry one coded diagnosis; newer ones list several per appointment, and every one is counted.</p>
+    </div>
+    <div class="grid-2">
+      <div class="chart">
+        <h3>Care categories, 2019 to 2022</h3>
+        <p class="sub">Each diagnosis grouped by keyword. Vaccinations count as preventive care.</p>
+        <div class="bars" id="pillar-bars"></div>
+        <p class="source">Source: the 2019–2022 synthetic export, one diagnosis per record.</p>
+      </div>
+      <div class="chart">
+        <h3>Most common diagnoses, January 2023 to June 2025</h3>
+        <p class="sub">Diagnoses listed on appointments; an appointment can list more than one.</p>
+        <div class="bars" id="dx-bars"></div>
+        <p class="source">Diagnoses seen fewer than five times are folded into Other rather than listed.</p>
+      </div>
+      <div class="chart">
+        <h3>Visit types, share of each period</h3>
+        <p class="sub">2023 (12 months) against January 2024 to June 2025 (18 months), so shares are compared, not counts.</p>
+        <div class="bars pair" id="type-bars"></div>
+        <div class="legend" aria-hidden="true"><span><i style="background:var(--ink)"></i>2023</span><span><i style="background:var(--spring)"></i>2024 to Jun 2025</span></div>
+        <details class="numbers"><summary>Show the numbers</summary><div class="table-scroll"><table id="type-table"></table></div></details>
+      </div>
+      <div class="chart">
+        <h3>ADHD follow-up appointments per month</h3>
+        <p class="sub">January 2023 to June 2025. They rise toward the end of each semester in the generator's model.</p>
+        <div id="adhd-chart" style="margin-top:16px"></div>
+        <p class="source">Months at 0 had fewer than five such appointments, or none.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="who" aria-labelledby="who-title">
+  <div class="wrap reveal">
+    <div class="section-head">
+      <p class="kicker">Who books</p>
+      <h2 id="who-title">The mix of patients barely changes between periods.</h2>
+      <p>Share of appointments by gender identity and by race, 2023 against January 2024 to June 2025. These are proportions of synthetic appointments, not of students, and say nothing about any real campus population.</p>
+    </div>
+    <div class="grid-2">
+      <div class="chart">
+        <h3>Gender identity, share of appointments</h3>
+        <div class="bars pair" id="gender-bars"></div>
+        <div class="legend" aria-hidden="true"><span><i style="background:var(--ink)"></i>2023</span><span><i style="background:var(--spring)"></i>2024 to Jun 2025</span></div>
+      </div>
+      <div class="chart">
+        <h3>Race, share of appointments</h3>
+        <div class="bars pair" id="race-bars"></div>
+        <div class="legend" aria-hidden="true"><span><i style="background:var(--ink)"></i>2023</span><span><i style="background:var(--spring)"></i>2024 to Jun 2025</span></div>
+      </div>
+    </div>
+    <p class="source" style="max-width:860px">Small race categories are merged into Other before counting, and a group with fewer than five appointments in a period is published as 0% for that period, the same as a group with none. When the 2024–25 export leaves gender identity blank, the legal sex field is used instead.</p>
+    <details class="numbers"><summary>Show the numbers</summary><div class="table-scroll"><table id="who-table"></table></div></details>
+  </div>
+</section>
+
+<section class="section" id="method" aria-labelledby="method-title">
+  <div class="wrap reveal">
+    <div class="section-head">
+      <p class="kicker">Method and privacy</p>
+      <h2 id="method-title">How the data is made and protected.</h2>
+      <p>The original dashboard ran on real student health records inside a controlled workspace. Those records can never be published, so this public version runs the same pipeline on generated data.</p>
+    </div>
+    <ol class="steps">
+      <li><b>Generate</b><span>A seeded model of an academic calendar writes three spreadsheets shaped like the original exports.</span></li>
+      <li><b>Reconcile</b><span>Different date formats, diagnosis codes and column names are mapped into one schema.</span></li>
+      <li><b>Strip identifiers</b><span>Columns that could identify a person are dropped as each file loads.</span></li>
+      <li><b>Aggregate</b><span>Only counts leave the build; no row-level record is published.</span></li>
+      <li><b>Suppress</b><span>Any count below 5 becomes 0 or Other, so it cannot be singled out.</span></li>
+      <li><b>Check</b><span>Tests scan the output for emails, phone numbers and similar, and fail the build if a rule breaks.</span></li>
+    </ol>
+    <div class="cols-3">
+      <div><h3>What the synthetic data is</h3><p>Appointments are drawn day by day from a fixed random seed: busy semesters, a winter break, quieter summers, weekday and hour preferences, and a seasonal mix of diagnoses. Every pattern on this page was put there by that model.</p></div>
+      <div><h3>What it cannot tell you</h3><ul><li>Nothing about real Stetson University patients or any real clinic.</li><li>No causes: the charts show counts, not why they change.</li><li>No clinical guidance of any kind.</li></ul></div>
+      <div><h3>Build and run it</h3><p>The whole page is one HTML file with its data and font embedded, so it opens offline from disk. The code, tests and generator are in the <a href="https://github.com/iamjeshurun/shs-campus-health-dashboard-public">GitHub repository</a>.</p></div>
+    </div>
+  </div>
+</section>
 </main>
 
+<footer class="site-footer">
+  <div class="wrap">SHS Campus Health Observatory. A synthetic public demo of a privacy-first dashboard; all figures are generated. <span id="generated-note"></span></div>
+</footer>
+
 <script>
-// ══════════════════════════════════════════════════════════════
-// DATA
-// ══════════════════════════════════════════════════════════════
 // DATA_INJECTION_POINT_START
 const D = {};
 // DATA_INJECTION_POINT_END
+</script>
+<script>
+document.documentElement.classList.add("js");
+const MOTION = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const COLOR = { fall: "#E8443A", spring: "#2D5BE3", summer: "#F7C531" };
+const SEASON_NAME = { fall: "fall semester", spring: "spring semester", summer: "summer" };
+const SVG = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => Number(n).toLocaleString("en-US");
+const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
+const season = (m) => (m >= 9 ? "fall" : m <= 4 ? "spring" : "summer");
+const monthLabel = (ym) => MONTHS[Number(ym.slice(5)) - 1] + " " + ym.slice(0, 4);
+const academic = (ym) => { const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5)); const f = m >= 9 ? y : y - 1; return f + "–" + String(f + 1).slice(2); };
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function svgEl(tag, attrs) { const e = document.createElementNS(SVG, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+function table(id, head, rows) {
+  $(id).innerHTML = "<thead><tr>" + head.map((h, i) => `<th scope="col"${i ? ' style="text-align:right"' : ""}>${esc(h)}</th>`).join("") + "</tr></thead><tbody>" +
+    rows.map((r) => "<tr>" + r.map((c, i) => (i ? `<td class="n">${esc(c)}</td>` : `<th scope="row">${esc(c)}</th>`)).join("") + "</tr>").join("") + "</tbody>";
+}
 
-// ══════════════════════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════════════════════
-const TEAL='#028090', TEAL_LT='#02c39a', NAVY='#065a82', WARN='#e5383b', AMBER='#fb8500', MID='#8fa8b2';
-const PILLAR_COLORS = ['#8fa8b2','#028090','#065a82','#02c39a','#e5383b'];
-const GENDER_COLORS = ['#028090','#065a82','#02c39a','#fb8500','#e5383b'];
-const RACE_COLORS   = ['#028090','#065a82','#02c39a','#fb8500','#8fa8b2','#e5383b'];
+/* ---------- Opening: one dot per synthetic appointment ---------- */
+const STEPS = [
+  { title: "Start with one dot.", text: `This dot is one synthetic appointment at the clinic, in the busiest month. Every appointment record gets a dot of its own: ${fmt(D.summary.total_records)} in all. The 2023\u201325 exports mark ${fmt(D.status.reduce((n, y) => n + y.Canceled + y["No Show"], 0))} of them as canceled or no-shows. The 2019\u20132022 export has no outcome field, so its ${fmt((D._meta.sources.find((x) => x.file.includes("2019")) || { rows: 0 }).rows)} records cannot be split that way.` },
+  { title: "Stack a month.", text: "That month's dots form one column. Each column is one month, from September 2019 to June 2025." },
+  { title: "Follow one academic year.", text: "From September to August: two tall semesters, a dip in December for winter break, and short summer months." },
+  { title: "Six years, one rhythm.", text: "Every year repeats that shape because the generator follows a typical academic calendar. With real clinic data, this is the view that would show when demand peaks and when it falls away." },
+  { title: "Why the data is synthetic.", text: "The original dashboard was built on real student health records, which cannot be published. This version uses generated appointments, drops identifying fields, and publishes any count below 5 as 0 or folds it into Other, so a 0 can mean none or fewer than five." },
+];
+const OPEN = { sel: null, step: null, year: null, msel: null };
+const M = D.monthly;
+let PEAK = 0, LOW = 0;
+M.forEach((m, i) => { if (m.visits > M[PEAK].visits) PEAK = i; if (m.visits < M[LOW].visits) LOW = i; });
+const YEAR_START = (() => { const p = M[PEAK].ym; const y = Number(p.slice(0, 4)), mo = Number(p.slice(5)); const start = (mo >= 9 ? y : y - 1) + "-09"; return Math.max(0, M.findIndex((m) => m.ym === start)); })();
+const AY = []; for (let s = M.findIndex((m) => m.ym.endsWith("-09")); s >= 0 && s < M.length; s += 12) AY.push({ start: s, months: M.slice(s, s + 12) });
+OPEN.year = Math.max(0, AY.findIndex((a) => a.start === YEAR_START));
 
-function mkChart(id, type, labels, datasets, opts={}) {
-  const ctx = document.getElementById(id);
-  if (!ctx) return;
-  ctx.setAttribute('role','img');
-  const heading = ctx.closest('.card')?.querySelector('h3')?.textContent?.trim();
-  if (heading) ctx.setAttribute('aria-label', heading);
-  return new Chart(ctx, {
-    type, data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: true,
-      plugins: { legend: { labels: { font: { family:'DM Sans', size:11 }, boxWidth:12 } }, ...opts.plugins },
-      scales: type==='pie'||type==='doughnut' ? {} : {
-        x: { ticks: { font:{family:'DM Sans',size:10}, maxRotation:45 }, grid:{display:false} },
-        y: { ticks: { font:{family:'DM Sans',size:10} }, grid:{color:'#eaf6f6'} },
-        ...opts.scales
-      },
-      ...opts
+function explainHTML() {
+  if (OPEN.step === null) {
+    return `<p class="what">A privacy-first dashboard built for a university student health clinic, shown here with generated data instead of patient records.</p>
+      <p><strong>How to read it:</strong> each dot is one appointment and each column is one month, colored by <span class="tag fall">fall semester</span>, <span class="tag spring">spring semester</span> or <span class="tag summer">summer</span>.</p>
+      <p><strong>What it shows:</strong> busy semesters, quiet summers and a dip every December. That rhythm is built into the data generator; it is not a finding about Stetson University patients.</p>
+      <button type="button" class="btn solid walk" data-act="start">Walk me through it</button>`;
+  }
+  const s = STEPS[OPEN.step];
+  return `<div aria-live="polite"><p class="step-no">Step ${OPEN.step + 1} of ${STEPS.length}</p><h2>${esc(s.title)}</h2><p>${esc(s.text)}</p></div>
+    <div class="controls"><button type="button" class="btn" data-act="back"${OPEN.step === 0 ? " disabled" : ""}>Back</button>
+    <button type="button" class="btn solid" data-act="next">${OPEN.step === STEPS.length - 1 ? "Finish" : "Next"}</button>
+    <button type="button" class="link-btn" data-act="exit">Show everything</button></div>`;
+}
+function renderExplain() {
+  for (const id of ["explain-desk", "explain-phone"]) {
+    const host = $(id);
+    const hadFocus = host.contains(document.activeElement) ? document.activeElement.dataset.act : null;
+    host.innerHTML = explainHTML().replace('<p class="what">', id === "explain-phone" ? '<p class="what" hidden>' : '<p class="what">');
+    if (hadFocus) {
+      const target = host.querySelector(`[data-act="${hadFocus}"]:not([disabled])`) || host.querySelector('[data-act="next"]') || host.querySelector('[data-act="start"]');
+      if (target) target.focus();
     }
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-// KPI STRIP
-// ══════════════════════════════════════════════════════════════
-function buildKPIs() {
-  const fmt = value => Number(value).toLocaleString('en-US');
-  const render = (id, items) => {
-    const strip = document.getElementById(id);
-    if (!strip) return;
-    strip.innerHTML = items.map(i=>`
-    <div class="kpi ${i.cls}">
-      <div class="kpi-val">${i.val}</div>
-      <div class="kpi-label">${i.label}</div>
-      <div class="kpi-note">${i.note}</div>
-    </div>`).join('');
-  };
-  const visibleMonths = D.monthly.filter(m=>m.visits >= D._meta.k_threshold);
-  const peakMonth = visibleMonths.reduce((a,b)=>b.visits>a.visits?b:a, visibleMonths[0]);
-  const lowMonth = visibleMonths.reduce((a,b)=>b.visits<a.visits?b:a, visibleMonths[0]);
-  const latestStatus = D.status[D.status.length-1];
-  const maxCell = rows => rows.reduce((a,b)=>b.value>a.value?b:a, rows[0]);
-  const peakTotal = maxCell(D.heatmap_total);
-  const peakNoShow = maxCell(D.heatmap_noshow);
-  const diseasePeak = key => D.infectious.reduce((a,b)=>b[key]>a[key]?b:a, D.infectious[0]);
-
-  render('kpi-strip', [
-    {val:fmt(D.summary.total_records), label:'Total Interactions', note:D.summary.years_covered, cls:''},
-    {val:`${D.summary.completion_rate_2425}%`, label:'Completion Rate', note:`Latest year (${latestStatus.year})`, cls:'green'},
-    {val:`${D.summary.noshow_rate_2425}%`, label:'No-Show Rate', note:`2023: ${D.summary.noshow_rate_2023}%`, cls:'warn'},
-    {val:D.summary.top_condition, label:'Top Recorded Diagnosis', note:'2023–2025', cls:'navy'},
-    {val:D.summary.peak_month, label:'Peak Month', note:`${fmt(peakMonth.visits)} interactions`, cls:'amber'},
-    {val:`${D.summary.new_patient_growth>=0?'+':''}${D.summary.new_patient_growth}%`, label:'New Patient Growth', note:'2023 → 2024', cls:'green'},
-  ]);
-  render('volume-kpis', [
-    {val:fmt(D.summary.total_records), label:'Total Interactions', note:D.summary.years_covered, cls:''},
-    {val:fmt(peakMonth.visits), label:'Highest Published Month', note:peakMonth.ym, cls:'navy'},
-    {val:fmt(lowMonth.visits), label:'Lowest Unsuppressed Month', note:lowMonth.ym, cls:'amber'},
-    {val:`${D.summary.new_patient_growth>=0?'+':''}${D.summary.new_patient_growth}%`, label:'New Patient Growth', note:'2023 → 2024', cls:'green'},
-  ]);
-  render('infectious-kpis', [
-    {val:diseasePeak('covid').ym, label:'Highest COVID Month', note:`${diseasePeak('covid').covid} published encounters`, cls:'warn'},
-    {val:diseasePeak('flu').ym, label:'Highest Flu Month', note:`${diseasePeak('flu').flu} published encounters`, cls:'amber'},
-    {val:diseasePeak('strep').ym, label:'Highest Strep Month', note:`${diseasePeak('strep').strep} published encounters`, cls:''},
-    {val:`k ≥ ${D._meta.k_threshold}`, label:'Privacy Threshold', note:'Smaller cells shown as 0', cls:'navy'},
-  ]);
-  render('operations-kpis', [
-    {val:`${D.summary.noshow_rate_2425}%`, label:'Latest No-Show Rate', note:`2023: ${D.summary.noshow_rate_2023}%`, cls:'warn'},
-    {val:`${peakNoShow.day.slice(0,3)} ${peakNoShow.hour}:00`, label:'Highest No-Show Cell', note:`${peakNoShow.value} published no-shows`, cls:'amber'},
-    {val:`${peakTotal.day.slice(0,3)} ${peakTotal.hour}:00`, label:'Highest Volume Cell', note:`${peakTotal.value} published appointments`, cls:'navy'},
-    {val:`${D.summary.completion_rate_2425}%`, label:'Latest Completion Rate', note:latestStatus.year, cls:'green'},
-  ]);
-
-  const genderTotal = Object.values(D.gender_2023).reduce((a,b)=>a+b,0) + Object.values(D.gender_2425).reduce((a,b)=>a+b,0);
-  const femaleTotal = (D.gender_2023.Female||0) + (D.gender_2425.Female||0);
-  const raceCombined = {};
-  for (const source of [D.race_2023,D.race_2425]) for (const [key,value] of Object.entries(source)) raceCombined[key]=(raceCombined[key]||0)+value;
-  const topRace = Object.entries(raceCombined).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('demographic-summary').innerHTML =
-    `<strong>Descriptive summary:</strong> Female observations comprise ${(femaleTotal/genderTotal*100).toFixed(1)}% of published gender-category counts. `+
-    `${topRace[0]} is the largest published race category (${fmt(topRace[1])} observations across both periods). `+
-    `Categories below k = ${D._meta.k_threshold} are omitted. These are visit-level descriptive counts; they do not measure campus prevalence, access, utilization rates, or disparities without an appropriate enrollment denominator and statistical analysis.`;
-}
-
-// ══════════════════════════════════════════════════════════════
-// OVERVIEW CHARTS
-// ══════════════════════════════════════════════════════════════
-function buildOverview() {
-  // Volume sparkline
-  mkChart('ov-volume','line',
-    D.monthly.map(m=>m.ym.slice(0,7)),
-    [{label:'Visits',data:D.monthly.map(m=>m.visits),
-      borderColor:TEAL,backgroundColor:'rgba(2,128,144,0.12)',
-      fill:true,tension:0.35,pointRadius:0,borderWidth:2}],
-    {plugins:{legend:{display:false}}}
-  );
-  // Pillar doughnut
-  mkChart('ov-pillar','doughnut',
-    D.pillars.map(p=>p.category),
-    [{data:D.pillars.map(p=>p.count),backgroundColor:PILLAR_COLORS,borderWidth:2,borderColor:'#fff'}],
-    {plugins:{legend:{position:'right'}}}
-  );
-  // Status grouped bar
-  mkChart('ov-status','bar',
-    D.status.map(s=>s.year),
-    [
-      {label:'Completed',data:D.status.map(s=>+(s.Completed/s.total*100).toFixed(1)),backgroundColor:TEAL,borderRadius:4},
-      {label:'Canceled', data:D.status.map(s=>+(s.Canceled/s.total*100).toFixed(1)), backgroundColor:AMBER,borderRadius:4},
-      {label:'No Show',  data:D.status.map(s=>+(s['No Show']/s.total*100).toFixed(1)),backgroundColor:WARN,borderRadius:4},
-    ],
-    {scales:{y:{ticks:{callback:v=>v+'%'},max:80}}}
-  );
-  // Top 10 diagnoses horizontal bar
-  const top10 = D.top_diagnoses.slice(0,10);
-  mkChart('ov-diag','bar',
-    top10.map(d=>d.diagnosis.length>30?d.diagnosis.slice(0,30)+'…':d.diagnosis),
-    [{label:'Count',data:top10.map(d=>d.count),
-      backgroundColor:[TEAL,NAVY,TEAL,NAVY,MID,TEAL_LT,TEAL,AMBER,NAVY,TEAL],
-      borderRadius:4}],
-    {indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{display:false}}}}
-  );
-}
-
-// ══════════════════════════════════════════════════════════════
-// VOLUME CHARTS
-// ══════════════════════════════════════════════════════════════
-function buildVolume() {
-  mkChart('vol-full','line',
-    D.monthly.map(m=>m.ym),
-    [{label:'Monthly Visits',data:D.monthly.map(m=>m.visits),
-      borderColor:TEAL,backgroundColor:'rgba(2,128,144,0.15)',
-      fill:true,tension:0.3,pointRadius:2,pointBackgroundColor:TEAL,borderWidth:2.5}],
-    {plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
-  );
-  // Visit types
-  const vt_labels = [...new Set([...Object.keys(D.visit_types_2023),...Object.keys(D.visit_types_2425)])];
-  mkChart('vol-types','bar',vt_labels,
-    [
-      {label:'2023',    data:vt_labels.map(k=>D.visit_types_2023[k]||0), backgroundColor:TEAL,   borderRadius:4},
-      {label:'2024–25', data:vt_labels.map(k=>D.visit_types_2425[k]||0), backgroundColor:AMBER,  borderRadius:4},
-    ],
-    {scales:{x:{ticks:{maxRotation:45,font:{size:9}}}}}
-  );
-  // ADHD
-  mkChart('vol-adhd','bar',
-    D.adhd.map(a=>a.ym),
-    [{label:'ADHD Encounters',data:D.adhd.map(a=>a.adhd),
-      backgroundColor:'rgba(6,90,130,0.75)',borderRadius:3}],
-    {plugins:{legend:{display:false}}}
-  );
-}
-
-// ══════════════════════════════════════════════════════════════
-// INFECTIOUS CHARTS
-// ══════════════════════════════════════════════════════════════
-function buildInfectious() {
-  const inf = D.infectious;
-  const labels = inf.map(i=>i.ym);
-  mkChart('inf-triple','line',labels,
-    [
-      {label:'COVID-19',data:inf.map(i=>i.covid),borderColor:WARN,backgroundColor:'rgba(229,56,59,0.08)',fill:true,tension:0.35,pointRadius:3,borderWidth:2.5},
-      {label:'Influenza',data:inf.map(i=>i.flu),borderColor:AMBER,backgroundColor:'rgba(251,133,0,0.08)',fill:true,tension:0.35,pointRadius:3,borderWidth:2.5},
-      {label:'Strep/Pharyngitis',data:inf.map(i=>i.strep),borderColor:TEAL,backgroundColor:'rgba(2,128,144,0.08)',fill:true,tension:0.35,pointRadius:3,borderWidth:2.5},
-    ],
-    {plugins:{legend:{display:false}}}
-  );
-  mkChart('inf-covid','line',labels,
-    [{label:'COVID-19',data:inf.map(i=>i.covid),borderColor:WARN,backgroundColor:'rgba(229,56,59,0.15)',fill:true,tension:0.35,borderWidth:2.5,pointRadius:3}],
-    {plugins:{legend:{display:false}}}
-  );
-  mkChart('inf-flu','line',labels,
-    [{label:'Influenza',data:inf.map(i=>i.flu),borderColor:AMBER,backgroundColor:'rgba(251,133,0,0.15)',fill:true,tension:0.35,borderWidth:2.5,pointRadius:3}],
-    {plugins:{legend:{display:false}}}
-  );
-}
-
-// ══════════════════════════════════════════════════════════════
-// HEATMAP
-// ══════════════════════════════════════════════════════════════
-let currentHeatmap = 'total';
-function buildHeatmap(mode) {
-  const data = mode==='total' ? D.heatmap_total : D.heatmap_noshow;
-  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
-  const hours=[8,9,10,11,12,13,14,15,16];
-  const vals = data.map(d=>d.value);
-  const maxVal = Math.max(...vals);
-  const grid = document.getElementById('heatmap-grid');
-  grid.innerHTML='';
-  // header row
-  grid.appendChild(Object.assign(document.createElement('div'),{className:'hm-cell hm-label',textContent:''}));
-  hours.forEach(h=>{
-    const el=document.createElement('div');
-    el.className='hm-cell hm-header';
-    el.textContent=h+':00';
-    grid.appendChild(el);
-  });
-  days.forEach(day=>{
-    const label=document.createElement('div');
-    label.className='hm-cell hm-label';
-    label.textContent=day.slice(0,3);
-    grid.appendChild(label);
-    hours.forEach(hour=>{
-      const entry=data.find(d=>d.day===day&&d.hour===hour);
-      const val=entry?entry.value:0;
-      const pct=maxVal>0?val/maxVal:0;
-      const el=document.createElement('div');
-      el.className='hm-cell';
-      el.title=`${day} ${hour}:00 — ${val} ${mode==='noshow'?'no-shows':'appointments'}`;
-      if(mode==='total'){
-        const g=Math.round(255-(255-0)*pct*0.6);
-        const b=Math.round(255-(255-144)*pct*0.8);
-        el.style.background=val>0?`rgb(${Math.round(2+pct*50)},${Math.round(128-pct*60)},${b})`:'#f0f7f9';
-        el.style.color=pct>0.5?'white':pct>0?'#065a82':'#d0e8ec';
-      } else {
-        const r=Math.round(229*pct+200*(1-pct));
-        el.style.background=val>0?`rgba(${r},${Math.round(56*pct)},${Math.round(59*pct)},${0.15+pct*0.85})`:'#f0f7f9';
-        el.style.color=pct>0.5?'white':pct>0?'#c0392b':'#d0e8ec';
-      }
-      if(val>0) el.textContent=val;
-      grid.appendChild(el);
-    });
-  });
-}
-function switchHeatmap(mode, btn) {
-  currentHeatmap=mode;
-  document.querySelectorAll('.hm-toggle button').forEach(b=>{
-    b.classList.remove('active');
-    b.setAttribute('aria-pressed','false');
-  });
-  btn.classList.add('active');
-  btn.setAttribute('aria-pressed','true');
-  buildHeatmap(mode);
-}
-
-// ══════════════════════════════════════════════════════════════
-// OPERATIONS CHARTS
-// ══════════════════════════════════════════════════════════════
-function buildOperations() {
-  buildHeatmap('total');
-  mkChart('ops-status','bar',
-    D.status.map(s=>s.year),
-    [
-      {label:'Completed',data:D.status.map(s=>s.Completed),backgroundColor:TEAL,borderRadius:4},
-      {label:'Canceled', data:D.status.map(s=>s.Canceled), backgroundColor:AMBER,borderRadius:4},
-      {label:'No Show',  data:D.status.map(s=>s['No Show']),backgroundColor:WARN,borderRadius:4},
-    ]
-  );
-  mkChart('ops-noshow','bar',
-    D.status.map(s=>s.year),
-    [{label:'No-Show Rate %',
-      data:D.status.map(s=>+(s['No Show']/s.total*100).toFixed(1)),
-      backgroundColor:[TEAL,AMBER,WARN],borderRadius:6}],
-    {plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'%'},max:20}}}
-  );
-}
-
-// ══════════════════════════════════════════════════════════════
-// DIAGNOSES
-// ══════════════════════════════════════════════════════════════
-function buildDiagnoses() {
-  mkChart('dx-pillar','doughnut',
-    D.pillars.map(p=>p.category),
-    [{data:D.pillars.map(p=>p.count),backgroundColor:PILLAR_COLORS,borderWidth:2,borderColor:'#fff'}],
-    {plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}
-  );
-  const maxCount=D.top_diagnoses[0].count;
-  const mentalKws=['anxiety','depression','mood'];
-  const infectKws=['sore throat','cough','pharyngitis','flu','viral','fever','sinusitis'];
-  const wellKws=['physical','screening','vaccine','well woman','contraceptive'];
-  const barsEl=document.getElementById('dx-bars');
-  barsEl.innerHTML=D.top_diagnoses.map((d,i)=>{
-    const dl=d.diagnosis.toLowerCase();
-    let cls='';
-    if(mentalKws.some(k=>dl.includes(k))) cls='mental';
-    else if(infectKws.some(k=>dl.includes(k))) cls='infectious';
-    else if(wellKws.some(k=>dl.includes(k))) cls='wellness';
-    return `<div class="diag-bar">
-      <div class="diag-label"><span>${i+1}. ${d.diagnosis}</span><span><b>${d.count}</b></span></div>
-      <div class="diag-track"><div class="diag-fill ${cls}" style="width:${(d.count/maxCount*100).toFixed(1)}%"></div></div>
-    </div>`;
-  }).join('');
-}
-
-// ══════════════════════════════════════════════════════════════
-// DEMOGRAPHICS
-// ══════════════════════════════════════════════════════════════
-function buildDemographics() {
-  function pieFromObj(id,obj) {
-    const keys=Object.keys(obj), vals=Object.values(obj);
-    mkChart(id,'doughnut',keys,[{data:vals,backgroundColor:GENDER_COLORS,borderWidth:2,borderColor:'#fff'}],
-      {plugins:{legend:{position:'right',labels:{font:{size:11}}}}}
-    );
-  }
-  function raceFromObj(id,obj) {
-    const keys=Object.keys(obj), vals=Object.values(obj);
-    mkChart(id,'doughnut',keys,[{data:vals,backgroundColor:RACE_COLORS,borderWidth:2,borderColor:'#fff'}],
-      {plugins:{legend:{position:'right',labels:{font:{size:10}}}}}
-    );
-  }
-  pieFromObj('dem-gender23',  D.gender_2023);
-  pieFromObj('dem-gender2425',D.gender_2425);
-  raceFromObj('dem-race23',   D.race_2023);
-  raceFromObj('dem-race2425', D.race_2425);
-}
-
-// ══════════════════════════════════════════════════════════════
-// TAB ROUTING
-// ══════════════════════════════════════════════════════════════
-const built = {};
-function showTab(name, button) {
-  document.querySelectorAll('.section').forEach(s=>{
-    s.classList.remove('active');
-    s.hidden=true;
-  });
-  document.querySelectorAll('nav button').forEach(b=>{
-    b.classList.remove('active');
-    b.setAttribute('aria-selected','false');
-    b.setAttribute('tabindex','-1');
-  });
-  const panel=document.getElementById('tab-'+name);
-  panel.hidden=false;
-  panel.classList.add('active');
-  button.classList.add('active');
-  button.setAttribute('aria-selected','true');
-  button.setAttribute('tabindex','0');
-  if(!built[name]) {
-    built[name]=true;
-    if(name==='overview')     buildOverview();
-    if(name==='volume')       buildVolume();
-    if(name==='infectious')   buildInfectious();
-    if(name==='operations')   buildOperations();
-    if(name==='diagnoses')    buildDiagnoses();
-    if(name==='demographics') buildDemographics();
   }
 }
-
-document.querySelector('[role="tablist"]').addEventListener('keydown', event=>{
-  const tabs=[...document.querySelectorAll('[role="tab"]')];
-  const current=tabs.indexOf(document.activeElement);
-  if(current<0) return;
-  let next=current;
-  if(event.key==='ArrowRight') next=(current+1)%tabs.length;
-  else if(event.key==='ArrowLeft') next=(current-1+tabs.length)%tabs.length;
-  else if(event.key==='Home') next=0;
-  else if(event.key==='End') next=tabs.length-1;
-  else return;
-  event.preventDefault();
-  tabs[next].click();
-  tabs[next].focus();
+function setStep(step) {
+  OPEN.step = step; OPEN.sel = null; OPEN.msel = null;
+  if (step !== null && step < 3) OPEN.year = Math.max(0, AY.findIndex((a) => a.start === YEAR_START));
+  renderExplain(); updateDesk(); renderPhone();
+}
+document.addEventListener("click", (ev) => {
+  const act = ev.target.closest("[data-act]");
+  if (!act) return;
+  const a = act.dataset.act;
+  if (a === "start") setStep(0);
+  if (a === "exit") setStep(null);
+  if (a === "back" && OPEN.step > 0) setStep(OPEN.step - 1);
+  if (a === "next") setStep(OPEN.step === STEPS.length - 1 ? null : OPEN.step + 1);
 });
 
-// ── INIT ──
-buildKPIs();
-built['overview']=true;
-buildOverview();
+/* Desktop field: all 70 months */
+const DK = { W: 1240, BOTTOM: 292, PER: 4, STEP: 4, DOT: 3 };
+DK.PLOT = DK.W - 72; DK.CW = DK.PLOT / M.length;
+const dx0 = (i) => i * DK.CW + (DK.CW - DK.PER * DK.STEP + (DK.STEP - DK.DOT)) / 2;
+const dtop = (v) => DK.BOTTOM - Math.ceil(v / DK.PER) * DK.STEP;
+const dcx = (i) => i * DK.CW + DK.CW / 2;
+let deskCols = [], deskOverlay;
+function buildDesk() {
+  const svg = svgEl("svg", { viewBox: `0 0 ${DK.W} 300`, role: "img", "aria-label": `Unit chart of ${fmt(D.summary.total_records)} synthetic appointments, one dot each, in monthly columns from ${monthLabel(M[0].ym)} to ${monthLabel(M[M.length - 1].ym)}. Semester months are tall and summer months short. Busiest month ${monthLabel(M[PEAK].ym)} with ${M[PEAK].visits} appointments; quietest ${monthLabel(M[LOW].ym)} with ${M[LOW].visits}.` });
+  for (const g of [100, 200]) {
+    const y = DK.BOTTOM - g / DK.PER * DK.STEP;
+    svg.append(svgEl("line", { x1: 0, x2: DK.PLOT, y1: y, y2: y, stroke: "#111", "stroke-opacity": ".18", "stroke-dasharray": "3 4" }));
+    const t = svgEl("text", { x: DK.W, y: y + 4, "text-anchor": "end", "font-size": 12, "font-weight": 700, fill: "#555" }); t.textContent = String(g); svg.append(t);
+  }
+  M.forEach((m, i) => {
+    let d = "";
+    for (let k = 0; k < m.visits; k++) d += `M${(dx0(i) + (k % DK.PER) * DK.STEP).toFixed(1)} ${DK.BOTTOM - (Math.floor(k / DK.PER) + 1) * DK.STEP}h${DK.DOT}v${DK.DOT}h-${DK.DOT}z`;
+    const p = svgEl("path", { d, fill: COLOR[season(Number(m.ym.slice(5)))], class: "col" });
+    p.style.animationDelay = i * 16 + "ms";
+    deskCols.push(p); svg.append(p);
+  });
+  deskOverlay = svgEl("g", {}); svg.append(deskOverlay);
+  const host = $("field"); host.append(svg);
+  if (MOTION) host.classList.add("grow");
+  const yb = $("year-brackets");
+  for (let s = 0; s < M.length; s += 12) {
+    const e = Math.min(s + 11, M.length - 1);
+    const span = document.createElement("span");
+    span.dataset.start = s;
+    span.textContent = academic(M[s].ym) + (e - s < 11 ? " (to " + MONTHS[Number(M[e].ym.slice(5)) - 1] + ")" : "");
+    span.style.left = (s * DK.CW / DK.W * 100) + "%"; span.style.width = ((e - s + 1) * DK.CW / DK.W * 100 - 0.5) + "%";
+    yb.append(span);
+  }
+  host.addEventListener("mousemove", (ev) => {
+    if (OPEN.step !== null) return;
+    const b = host.getBoundingClientRect();
+    const i = Math.floor((ev.clientX - b.left) / b.width * DK.W / DK.CW);
+    if (i >= 0 && i < M.length && i !== OPEN.sel) { OPEN.sel = i; updateDesk(); }
+  });
+  host.addEventListener("mouseleave", () => { if (OPEN.step === null) { OPEN.sel = null; updateDesk(); } });
+  const slider = $("month-slider"); slider.max = M.length - 1; slider.value = PEAK;
+  slider.addEventListener("input", () => { OPEN.step = null; OPEN.sel = Number(slider.value); renderExplain(); updateDesk(); });
+}
+function note(x, y1, y2, tx, ty, anchor, text) {
+  deskOverlay.append(svgEl("line", { x1: x, x2: x, y1, y2, stroke: "#111", "stroke-width": 1.5 }));
+  const t = svgEl("text", { x: tx, y: ty, "text-anchor": anchor, "font-size": 15, "font-weight": 800, fill: "#111", stroke: "#fff", "stroke-width": 5, "stroke-linejoin": "round", "paint-order": "stroke" });
+  t.textContent = text; deskOverlay.append(t);
+}
+function updateDesk() {
+  const { step, sel } = OPEN;
+  const focus = (i) => step === 0 ? false : step === 1 ? i === PEAK : step === 2 ? i >= YEAR_START && i < YEAR_START + 12 : step === null && sel !== null ? i === sel : true;
+  deskCols.forEach((p, i) => p.setAttribute("opacity", focus(i) ? 1 : 0.16));
+  document.querySelectorAll("#year-brackets span").forEach((s) => (s.style.opacity = step === 2 && Number(s.dataset.start) !== YEAR_START ? 0.3 : 1));
+  deskOverlay.replaceChildren();
+  const pv = M[PEAK].visits, LOWV = M[LOW].visits;
+  const busiest = () => note(dcx(PEAK), dtop(pv) - 4, dtop(pv) - 14, dcx(PEAK), dtop(pv) - 20, "middle", `Busiest: ${monthLabel(M[PEAK].ym)}, ${pv}`);
+  if (step === null || step === 3) {
+    busiest();
+    note(dcx(LOW), dtop(LOWV) - 4, dtop(LOWV) - 34, dcx(LOW), dtop(LOWV) - 40, "middle", `Quietest: ${monthLabel(M[LOW].ym)}, ${LOWV}`);
+  }
+  if (step === 0) {
+    const k = pv - 1, rx = dx0(PEAK) + (k % DK.PER) * DK.STEP, ry = DK.BOTTOM - (Math.floor(k / DK.PER) + 1) * DK.STEP;
+    deskOverlay.append(svgEl("circle", { cx: rx + 1.5, cy: ry + 1.5, r: 9, fill: "none", stroke: "#111", "stroke-width": 2.5 }));
+    deskOverlay.append(svgEl("rect", { x: rx, y: ry, width: 3, height: 3, fill: "#111" }));
+    note(rx + 1.5, ry - 8, ry - 22, rx + 1.5, ry - 28, "middle", "One appointment");
+  }
+  const boxI = step === 1 ? PEAK : step === null ? sel : null;
+  if (boxI !== null) {
+    const v = M[boxI].visits;
+    deskOverlay.append(svgEl("rect", { x: boxI * DK.CW - 1, y: dtop(v) - 3, width: DK.CW + 2, height: DK.BOTTOM - dtop(v) + 4, fill: "none", stroke: "#111", "stroke-width": 2 }));
+  }
+  if (step === 1) busiest();
+  if (step === 2) {
+    const yr = M.slice(YEAR_START, YEAR_START + 12);
+    const colTop = (a, b) => Math.min(...yr.slice(a, b + 1).map((m) => dtop(m.visits)));
+    const yearTop = colTop(0, 11), at = (j) => dcx(YEAR_START + j);
+    note(at(1), colTop(0, 2) - 4, yearTop - 12, at(1) - 4, yearTop - 18, "end", "Fall semester");
+    note(at(5.5), colTop(4, 7) - 4, yearTop - 12, at(5.5) + 4, yearTop - 18, "start", "Spring semester");
+    note(at(3), colTop(3, 3) - 4, colTop(3, 3) - 22, at(3), colTop(3, 3) - 28, "middle", "Winter break");
+    if (yr.length > 8) note(at(9.5), colTop(8, Math.min(11, yr.length - 1)) - 4, colTop(8, Math.min(11, yr.length - 1)) - 22, at(9.5), colTop(8, Math.min(11, yr.length - 1)) - 28, "middle", "Summer");
+  }
+  const r = $("readout");
+  if (step === null && sel !== null) {
+    const m = M[sel];
+    r.textContent = `${monthLabel(m.ym)}: ${m.visits} synthetic appointments, ${SEASON_NAME[season(Number(m.ym.slice(5)))]}, academic year ${academic(m.ym)}.`;
+  } else r.textContent = "Point at a month, or use the slider below, to read its count.";
+}
+
+/* Phone field: one academic year at a time */
+const PH = { W: 358, BOTTOM: 230, PER: 6, STEP: 4.6, DOT: 3.6 }; PH.CW = PH.W / 12;
+const ORDER = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
+function renderPhone() {
+  const { step } = OPEN; const yi = OPEN.year; const months = AY[yi].months; const msel = step === null ? OPEN.msel : null;
+  $("year-chips").innerHTML = AY.map((a, i) => `<button type="button" data-year="${i}" aria-pressed="${i === yi}">${academic(a.months[0].ym)}</button>`).join("");
+  const svg = svgEl("svg", { viewBox: `0 0 ${PH.W} 236`, role: "img", "aria-label": `Unit chart of synthetic appointments in academic year ${academic(months[0].ym)}, one dot per appointment, September to August, with each month's count printed above its column.` });
+  const focus = (j) => step === 0 ? false : step === 1 ? months[j] && months[j].ym === M[PEAK].ym : msel !== null ? j === msel : true;
+  const x0 = (j) => j * PH.CW + (PH.CW - PH.PER * PH.STEP + (PH.STEP - PH.DOT)) / 2;
+  ORDER.forEach((mn, j) => {
+    const m = months[j], v = m ? m.visits : null, op = focus(j) ? 1 : 0.16;
+    if (v) {
+      let d = "";
+      for (let k = 0; k < v; k++) d += `M${(x0(j) + (k % PH.PER) * PH.STEP).toFixed(1)} ${(PH.BOTTOM - (Math.floor(k / PH.PER) + 1) * PH.STEP).toFixed(1)}h${PH.DOT}v${PH.DOT}h-${PH.DOT}z`;
+      svg.append(svgEl("path", { d, fill: COLOR[season(mn)], opacity: op, class: "col" }));
+    }
+    const t = svgEl("text", { x: j * PH.CW + PH.CW / 2, y: v ? PH.BOTTOM - Math.ceil(v / PH.PER) * PH.STEP - 5 : PH.BOTTOM - 5, "text-anchor": "middle", "font-size": 11, "font-weight": 800, fill: "#111", opacity: op });
+    t.textContent = v === null ? "–" : v; svg.append(t);
+  });
+  if (step === 0 && months[1]) {
+    const v = months[1].visits, k = v - 1, rx = x0(1) + (k % PH.PER) * PH.STEP, ry = PH.BOTTOM - (Math.floor(k / PH.PER) + 1) * PH.STEP;
+    svg.append(svgEl("circle", { cx: rx + 1.8, cy: ry + 1.8, r: 8, fill: "none", stroke: "#111", "stroke-width": 2.5 }));
+    svg.append(svgEl("rect", { x: rx, y: ry, width: PH.DOT, height: PH.DOT, fill: "#111" }));
+  }
+  $("phone-field").replaceChildren(svg);
+  $("month-buttons").innerHTML = ORDER.map((mn, j) => `<button type="button" data-month="${j}" aria-label="${FULL[mn - 1]}" aria-pressed="${msel === j}">${MONTHS[mn - 1]}</button>`).join("");
+  let text = "Tap a month for details." + (months.length < 12 ? " Later months of this academic year are not in the data yet." : "");
+  if (msel !== null) { const m = months[msel], mn = ORDER[msel]; text = m ? `${monthLabel(m.ym)}: ${m.visits} synthetic appointments, ${SEASON_NAME[season(mn)]}.` : `${FULL[mn - 1]} is not in the data yet.`; }
+  $("phone-readout").textContent = text;
+}
+$("year-chips").addEventListener("click", (ev) => { const b = ev.target.closest("[data-year]"); if (!b) return; OPEN.year = Number(b.dataset.year); OPEN.msel = null; if (OPEN.step !== null) { OPEN.step = null; renderExplain(); updateDesk(); } renderPhone(); });
+$("month-buttons").addEventListener("click", (ev) => { const b = ev.target.closest("[data-month]"); if (!b) return; OPEN.msel = Number(b.dataset.month); if (OPEN.step !== null) { OPEN.step = null; renderExplain(); updateDesk(); } renderPhone(); $("month-buttons").querySelector(`[data-month="${b.dataset.month}"]`).focus(); });
+
+/* ---------- Busiest hours: heatmap table ---------- */
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16];
+const hourLabel = (h) => (h % 12 || 12) + (h < 12 ? " a.m." : " p.m.");
+function renderHeat(kind) {
+  const src = kind === "noshow" ? D.heatmap_noshow : D.heatmap_total;
+  const val = {}; src.forEach((c) => (val[c.day + c.hour] = c.value));
+  const max = Math.max(...src.map((c) => c.value), 1);
+  let html = `<caption class="visually-hidden">${kind === "noshow" ? "No-show appointments" : "Total appointments"} by weekday and starting hour</caption><thead><tr><td class="corner"></td>` + HOURS.map((h) => `<th scope="col">${String(h % 12 || 12)}${h < 12 ? "a" : "p"}</th>`).join("") + "</tr></thead><tbody>";
+  for (const d of DAYS) {
+    html += `<tr><th scope="row">${d.slice(0, 3)}</th>`;
+    for (const h of HOURS) {
+      const v = val[d + h];
+      // The build omits cells under 5; per the privacy contract they show as 0, the same as a true zero.
+      const v0 = v === undefined ? 0 : v;
+      const a = 0.12 + 0.88 * (v0 / max);
+      html += `<td style="background:rgba(17,17,17,${a.toFixed(3)});color:${a > 0.6 ? "#fff" : "#111"}" title="${d} ${hourLabel(h)}: ${v0}">${v0}</td>`;
+    }
+    html += "</tr>";
+  }
+  $("heatmap").innerHTML = html + "</tbody>";
+  $("heat-title").textContent = (kind === "noshow" ? "No-show appointments" : "Total appointments") + " by weekday and hour";
+  const top = [...src].sort((a, b) => b.value - a.value)[0];
+  const total = src.reduce((s, c) => s + c.value, 0);
+  $("heat-guide").innerHTML = `<strong>How to read it:</strong> rows are weekdays, columns the hour an appointment starts. The busiest slot is <strong>${top.day} at ${hourLabel(top.hour)}</strong> with ${top.value} ${kind === "noshow" ? "no-shows" : "appointments"}. The 12 p.m. column stays light because the generator gives lunchtime fewer bookings.` + (kind === "noshow" ? ` A 0 would mean fewer than five, or none.` : "");
+  $("heat-total").setAttribute("aria-pressed", String(kind !== "noshow"));
+  $("heat-noshow").setAttribute("aria-pressed", String(kind === "noshow"));
+}
+$("heat-total").addEventListener("click", () => renderHeat("total"));
+$("heat-noshow").addEventListener("click", () => renderHeat("noshow"));
+
+/* ---------- Outcomes ---------- */
+function renderOutcomes() {
+  $("outcome-bars").innerHTML = D.status.map((y) => {
+    const part = (k, cls, label) => { const s = y[k] / y.total; return `<span class="${cls}" style="width:${(s * 100).toFixed(2)}%" title="${label}: ${fmt(y[k])} (${pct(s)})">${s > 0.07 ? pct(s, 0) : ""}</span>`; };
+    return `<div class="stack-row"><div class="label num">${y.year}<small>${fmt(y.total)} booked${y.year === "2025" ? ", Jan to Jun" : ""}</small></div><div class="stack" role="img" aria-label="${y.year}: ${pct(y.Completed / y.total)} completed, ${pct(y.Canceled / y.total)} canceled, ${pct(y["No Show"] / y.total)} no-show">${part("Completed", "completed", "Completed")}${part("Canceled", "canceled", "Canceled")}${part("No Show", "noshow", "No-show")}</div></div>`;
+  }).join("");
+  const rates = D.status.map((y) => `${pct(y["No Show"] / y.total)} in ${y.year}`).join(", ");
+  $("outcome-guide").innerHTML = `<strong>How to read it:</strong> each bar is one year's bookings split by outcome. No-show rates were ${rates}. In the generator, no-shows rise slightly in the last weeks of each semester.`;
+  table("outcome-table", ["Year", "Completed", "Canceled", "No-show", "Total"], D.status.map((y) => [y.year, fmt(y.Completed), fmt(y.Canceled), fmt(y["No Show"]), fmt(y.total)]));
+}
+
+/* ---------- Seasonal illness: small multiples ---------- */
+function renderIllness() {
+  const series = [["covid", "COVID-19"], ["flu", "Influenza"], ["strep", "Strep throat and pharyngitis"]];
+  const rows = D.infectious;
+  const max = Math.max(...rows.flatMap((r) => [r.covid, r.flu, r.strep]), 10);
+  const top = Math.ceil(max / 10) * 10;
+  const W = 340, H = 150, B = 128, PLOT = W - 26, cw = PLOT / rows.length;
+  const host = $("illness-charts");
+  series.forEach(([key, name]) => {
+    const peak = rows.reduce((a, r) => (r[key] > a[key] ? r : a), rows[0]);
+    const fig = document.createElement("figure");
+    fig.innerHTML = `<h3>${name}</h3><p class="sub num">Peak: ${monthLabel(peak.ym)}, ${peak[key]} appointments</p>`;
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H + 18}`, role: "img", "aria-label": `${name}: monthly synthetic appointments from ${monthLabel(rows[0].ym)} to ${monthLabel(rows[rows.length - 1].ym)}, peaking at ${peak[key]} in ${monthLabel(peak.ym)}.` });
+    for (const g of [0, top / 2, top]) {
+      const y = B - g / top * (B - 10);
+      svg.append(svgEl("line", { x1: 0, x2: PLOT, y1: y, y2: y, stroke: "#111", "stroke-opacity": g ? ".15" : ".6" }));
+      const t = svgEl("text", { x: W, y: y + 4, "text-anchor": "end", "font-size": 10, fill: "#555" }); t.textContent = g; svg.append(t);
+    }
+    rows.forEach((r, i) => {
+      const h = r[key] / top * (B - 10);
+      svg.append(svgEl("rect", { x: i * cw + 1, y: B - h, width: Math.max(1, cw - 2), height: h, fill: COLOR[season(Number(r.ym.slice(5)))] }));
+      if (r.ym.endsWith("-01")) { const t = svgEl("text", { x: i * cw, y: H + 10, "font-size": 11, "font-weight": 700, fill: "#111" }); t.textContent = r.ym.slice(0, 4); svg.append(t); }
+    });
+    fig.append(svg); host.append(fig);
+  });
+  table("illness-table", ["Month", "COVID-19", "Influenza", "Strep / pharyngitis"], rows.map((r) => [monthLabel(r.ym), r.covid, r.flu, r.strep]));
+}
+
+/* ---------- Reasons and people: HTML bars ---------- */
+function bars(id, items, opts = {}) {
+  const max = Math.max(...items.map((i) => i.value));
+  $(id).innerHTML = items.map((i) => `<div class="bar-row"><span class="label">${esc(i.label)}</span><span class="bar-track"><span class="bar-fill" style="--s:${(i.value / max).toFixed(4)}"></span></span><span class="value">${opts.format ? opts.format(i.value) : fmt(i.value)}</span></div>`).join("");
+}
+function pairs(id, a, b) {
+  const keys = [...new Set([...Object.keys(a), ...Object.keys(b)])];
+  const ta = Object.values(a).reduce((s, v) => s + v, 0), tb = Object.values(b).reduce((s, v) => s + v, 0);
+  const rows = keys.map((k) => ({ k, a: a[k] ? a[k] / ta : null, b: b[k] ? b[k] / tb : null })).sort((x, y) => (y.a || 0) + (y.b || 0) - (x.a || 0) - (x.b || 0));
+  const max = Math.max(...rows.flatMap((r) => [r.a || 0, r.b || 0]));
+  const label = (x) => pct(x || 0); // an omitted group is published as 0%, like a true zero
+  $(id).innerHTML = rows.map((r) => `<div class="bar-row"><span class="label">${esc(r.k.replace("Multiple / Other", "Multiple races"))}</span><span class="bar-track"><span class="bar-fill" style="--s:${((r.a || 0) / max).toFixed(4)}" title="2023: ${label(r.a)}"></span><span class="bar-fill b" style="--s:${((r.b || 0) / max).toFixed(4)}" title="2024 to Jun 2025: ${label(r.b)}"></span></span><span class="value" style="font-size:13px;line-height:1.3">${label(r.a)}<br><span style="color:var(--spring)">${label(r.b)}</span></span></div>`).join("");
+  return rows.map((r) => [r.k, label(r.a), label(r.b)]);
+}
+function renderReasons() {
+  bars("pillar-bars", D.pillars.map((p) => ({ label: p.category, value: p.count })));
+  bars("dx-bars", D.top_diagnoses.slice(0, 12).map((d) => ({ label: d.diagnosis.replace(", unspecified etiology", ""), value: d.count })));
+  const typeName = (t) => ({ "OFFICE VISIT": "Office visit", "NEW PATIENT": "New patient", "PHYSICAL": "Physical", "SUPPORT STAFF VISIT": "Nurse or staff visit" }[t] || t);
+  const rename = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [typeName(k), v]));
+  const typeRows = pairs("type-bars", rename(D.visit_types_2023), rename(D.visit_types_2425));
+  table("type-table", ["Visit type", "2023", "2024 to Jun 2025"], typeRows);
+  const rows = D.adhd, W = 460, H = 140, B = 118, PLOT = W - 26, cw = PLOT / rows.length, top = Math.ceil(Math.max(...rows.map((r) => r.adhd), 10) / 10) * 10;
+  const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H + 16}`, role: "img", "aria-label": "ADHD follow-up appointments per month, January 2023 to June 2025. Counts rise toward the end of each semester; months under 5 are published as 0." });
+  svg.style.width = "100%"; svg.style.height = "auto"; svg.style.display = "block";
+  for (const g of [0, top / 2, top]) {
+    const y = B - g / top * (B - 10);
+    svg.append(svgEl("line", { x1: 0, x2: PLOT, y1: y, y2: y, stroke: "#111", "stroke-opacity": g ? ".15" : ".6" }));
+    const t = svgEl("text", { x: W, y: y + 4, "text-anchor": "end", "font-size": 10, fill: "#555" }); t.textContent = g; svg.append(t);
+  }
+  rows.forEach((r, i) => {
+    const h = r.adhd / top * (B - 10);
+    svg.append(svgEl("rect", { x: i * cw + 1, y: B - h, width: cw - 2, height: h, fill: COLOR[season(Number(r.ym.slice(5)))] }));
+    if (r.ym.endsWith("-01")) { const t = svgEl("text", { x: i * cw, y: H + 8, "font-size": 11, "font-weight": 700, fill: "#111" }); t.textContent = r.ym.slice(0, 4); svg.append(t); }
+  });
+  $("adhd-chart").replaceChildren(svg);
+}
+function renderWho() {
+  const g = pairs("gender-bars", D.gender_2023, D.gender_2425);
+  const r = pairs("race-bars", D.race_2023, D.race_2425);
+  table("who-table", ["Group", "2023", "2024 to Jun 2025"], [...g, ...r]);
+}
+
+/* ---------- Page ---------- */
+function reveal() {
+  const items = document.querySelectorAll(".reveal");
+  if (!("IntersectionObserver" in window) || !MOTION) { items.forEach((e) => e.classList.add("in")); return; }
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -10% 0px" });
+  items.forEach((e) => io.observe(e));
+}
+function trackSections() {
+  const links = [...document.querySelectorAll(".section-nav a")];
+  if (!("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (e.isIntersecting) links.forEach((l) => l.setAttribute("aria-current", String(l.getAttribute("href") === "#" + e.target.id)));
+  }), { rootMargin: "-40% 0px -55% 0px" });
+  document.querySelectorAll("main > section").forEach((s) => io.observe(s));
+}
+function buildPage() {
+  renderExplain();
+  buildDesk(); updateDesk(); renderPhone();
+  renderHeat("total"); renderOutcomes(); renderIllness(); renderReasons(); renderWho();
+  $("generated-note").textContent = "Data generated " + D._meta.generated_at.slice(0, 10) + "; small-count threshold k = " + D._meta.k_threshold + ".";
+  reveal(); trackSections();
+}
+buildPage();
 </script>
 </body>
 </html>

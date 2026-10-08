@@ -7,3 +7,19 @@ and do not represent actual patients, appointments, or clinical records.
 The original internship project operated on institution-provided exports in a
 controlled local workspace. Those exports and all row-level records are
 excluded from this repository.
+
+## How the synthetic visits are generated
+
+`src/generate_synthetic_data.py` draws visits day by day from a fixed random seed (`20250630`), so every build produces
+the same data. The model is a generic academic calendar, not any real campus:
+
+- Volume is full during fall and spring semesters, lower in summer, near zero over winter break, and reduced during
+  Thanksgiving week and spring break. The clinic is closed at weekends and busiest on Mondays.
+- The diagnosis mix shifts with the season: respiratory illness in winter, vaccines and physicals at the start of the
+  fall term, and mental-health visits rising toward midterms and finals.
+- A few deliberately small groups (rare diagnoses, small demographic categories) fall below the `k = 5` threshold so the
+  build's suppression rules are exercised.
+
+Every pattern in the public dashboard was put there by this model. None of it is a finding about Stetson University
+patients or any real clinic. NumPy is pinned in `requirements.txt` because generator streams can change between NumPy
+releases, and CI checks that the published page rebuilds byte for byte.
