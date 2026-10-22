@@ -15,6 +15,7 @@ Privacy rules (see README.md for full description):
 
 from __future__ import annotations
 
+import calendar
 import json
 import os
 import re
@@ -81,35 +82,6 @@ VISIT_TYPE_NORMALIZE = {
     # 2023 names → canonical (already mostly canonical)
     "TELEMEDICINE VISIT": "TELEMEDICINE",
     "PAP SMEAR/PELVIC EXAM": "WELL WOMAN",
-}
-
-# CPT-code → visit-type mapping (used for 2019-2022 data only).
-CPT_TO_VISIT_TYPE = {
-    "99213": "OFFICE VISIT",     # OFFICE O/P EST LOW 20-29 MIN
-    "99214": "OFFICE VISIT",     # OFFICE O/P EST MOD 30-39 MIN
-    "99203": "NEW PATIENT",      # OFFICE O/P NEW LOW 30-44 MIN
-    "99204": "NEW PATIENT",
-    "99395": "PHYSICAL",         # PREV VISIT EST AGE 18-39
-    "99396": "PHYSICAL",
-    "99397": "PHYSICAL",
-    "G0438": "PHYSICAL",
-    "G0439": "PHYSICAL",
-    "99406": "SUPPORT STAFF VISIT",  # BEHAV CHNG SMOKING
-    "90471": "SUPPORT STAFF VISIT",  # IMMUNIZATION ADMIN
-    "96372": "SUPPORT STAFF VISIT",  # THER/PROPH/DIAG INJ
-    "87880": "LAB",
-    "87426": "LAB",
-    "86308": "LAB",
-    "81003": "LAB",
-    "36415": "LAB",
-    "93000": "OFFICE VISIT",
-    "90686": "SUPPORT STAFF VISIT",  # flu vaccine
-    "90707": "SUPPORT STAFF VISIT",  # MMR
-    "J0120": "SUPPORT STAFF VISIT",
-    "J0696": "SUPPORT STAFF VISIT",
-    "J1030": "SUPPORT STAFF VISIT",
-    "3074F": "OFFICE VISIT",
-    "3078F": "OFFICE VISIT",
 }
 
 # Health-pillar classification (keyword → pillar).
@@ -269,10 +241,6 @@ def normalize_visit_type(s: str) -> str:
     s = (s or "").strip().upper()
     return VISIT_TYPE_NORMALIZE.get(s, s)
 
-
-def cpt_to_visit_type(cpt: str) -> str:
-    code = (cpt or "").split(" - ", 1)[0].strip().upper()
-    return CPT_TO_VISIT_TYPE.get(code, "OTHER")
 
 
 def classify_pillar(dx: str) -> str:
@@ -621,13 +589,8 @@ def build_summary(s: Sources, monthly: list[dict], status: list[dict]) -> dict:
     peak = max(monthly, key=lambda m: m["visits"]) if monthly else None
     peak_str = ""
     if peak:
-        month_names = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        try:
-            y, m = peak["ym"].split("-")
-            peak_str = f"{month_names[int(m)]} {y}"
-        except Exception:
-            peak_str = peak["ym"]
+        y, m = peak["ym"].split("-")
+        peak_str = f"{calendar.month_abbr[int(m)]} {y}"
 
     # Completion / no-show rates from latest year
     latest_year = max((d["year"] for d in status), default=None)
@@ -735,7 +698,7 @@ def main() -> int:
 
     print("Validating privacy…")
     assert_no_pii(dashboard)
-    print("  ✓ no forbidden columns or PII values found")
+    print("  no forbidden columns or PII values found")
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = OUT_DIR / "dashboard.json"

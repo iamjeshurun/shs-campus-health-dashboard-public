@@ -103,6 +103,9 @@ tests/test_dashboard_html.py    offline/self-contained HTML checks
 tests/test_dashboard_browser.py desktop and phone browser checks
 SHS_Dashboard.template.html     dashboard HTML/CSS/JavaScript source
 SHS_Dashboard.html              generated public dashboard
+scripts/bootstrap.sh            create the virtual environment and install dependencies
+scripts/build_all.sh            generate, build and run every test in one go
+vendor/                         embedded Archivo font and its license (OFL)
 ```
 
 ## Important interpretation note
